@@ -1,14 +1,36 @@
 # Import modules
 
-import discord
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
 import sqlite3 as sl
+import discord, json
+# Configure bot
+
+PATH = "/".join(__file__.split("/")[:-2])+"/"
+DBS = PATH+"dbs/"
+CONFIG = PATH+"config.json"
+
+f = open(str(CONFIG))
+config = json.loads(f.read())
+f.close()
+
+conns = {}
+currs = {}
+
+for database in config['currencies']:
+	conn = sl.connect(DBS+database+".db")
+	curr = conn.cursor()
+	curr.execute("CREATE TABLE IF NOT EXISTS user (aid INTEGER NOT NULL PRIMARY KEY, cid INTEGER, bal DOUBLE);")
+	curr.execute("CREATE TABLE IF NOT EXISTS transactions (tid INTEGER NOT NULL PRIMARY KEY, sid INTEGER, rid INTEGER, amt DOUBLE);")
+	conn.commit()
+	conns[database] = conn
+	currs[database] = curr
+
 
 # Main code
 
-bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.all())
+bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
 
 @bot.event
 async def on_ready():
@@ -62,4 +84,4 @@ async def strtest(interaction: discord.Interaction, user: discord.Member, amount
     elif user == interaction.user.mention: await interaction.response.send_message(embed=embed2),
     else: await interaction.response.send_message(f"This is a testing command, representing {interaction.user.name}, that wanted to give {amount} {currency} to {user.mention}.")
 
-bot.run("insert-token-here")
+bot.run(config["token"])
