@@ -13,8 +13,10 @@ Once you have installed those things, run the following commands:
 ```bash
 git clone https://github.com/CrescentFlower-Inc/MicroCurrency/
 cd MicroCurrency
-poetry instal
+poetry install
 ```
+Then also rename `config.json.example` back to `config.json` and configure your bot!
+
 # HOW TO RUN
 To run the bot, you just need to run `poetry run bot`
 
