@@ -1,5 +1,6 @@
 # Import modules
 
+
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
@@ -84,4 +85,5 @@ async def strtest(interaction: discord.Interaction, user: discord.Member, amount
     elif user == interaction.user.mention: await interaction.response.send_message(embed=embed2),
     else: await interaction.response.send_message(f"This is a testing command, representing {interaction.user.name}, that wanted to give {amount} {currency} to {user.mention}.")
 
-bot.run(config["token"])
+def start():
+	bot.run(config["token"])
