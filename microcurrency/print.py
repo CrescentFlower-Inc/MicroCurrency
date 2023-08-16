@@ -14,9 +14,9 @@ def start():
 	conn = sqlite3.connect(DBS+db)
 	curr = sqlite3.cursor()
 
-	target = int(input("Target UID: "))
+	target = int(input("Target AID: "))
 	amount = float(input("Amount: "))
-	curr.execute("UPDATE users SET bal=? WHERE uid=?",(amount,target,))
+	curr.execute("UPDATE user SET bal=? WHERE aid=?",(amount,target,))
 	conn.commit()
 
 	print("all done!")
