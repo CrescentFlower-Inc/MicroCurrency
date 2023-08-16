@@ -1,14 +1,42 @@
 # Import modules
-
-import discord
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
+from typing import List
 import sqlite3 as sl
+import discord, json, typing
+# Configure bot
+
+PATH = "/".join(__file__.split("/")[:-2])+"/"
+DBS = PATH+"dbs/"
+CONFIG = PATH+"config.json"
+
+f = open(str(CONFIG))
+config = json.loads(f.read())
+f.close()
+
+conns = {}
+currs = {}
+
+for database in config['currencies']:
+	conn = sl.connect(DBS+database+".db")
+	curr = conn.cursor()
+	curr.execute("CREATE TABLE IF NOT EXISTS user (aid INTEGER NOT NULL PRIMARY KEY, cid INTEGER, bal DOUBLE);")
+	curr.execute("CREATE TABLE IF NOT EXISTS transactions (tid INTEGER NOT NULL PRIMARY KEY, sid INTEGER, rid INTEGER, amt DOUBLE);")
+	conn.commit()
+	conns[database] = conn
+	currs[database] = curr
+
+
+# Initialize discord.py values
+
+currchoices = []
+for curr in config["currencies"]:
+	currchoices.append(app_commands.Choice(name=curr, value=curr))
 
 # Main code
 
-bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.all())
+bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
 
 @bot.event
 async def on_ready():
@@ -62,4 +90,32 @@ async def strtest(interaction: discord.Interaction, user: discord.Member, amount
     elif user == interaction.user.mention: await interaction.response.send_message(embed=embed2),
     else: await interaction.response.send_message(f"This is a testing command, representing {interaction.user.name}, that wanted to give {amount} {currency} to {user.mention}.")
 
-bot.run("insert-token-here")
+@app_commands.describe(curr = "What currency", user = "The target user")
+@app_commands.choices(curr=currchoices)
+@bot.tree.command(name="bal",description="Gets the balance of your or somebody else's account")
+async def balance(interaction: discord.Interaction, curr: app_commands.Choice[str], user: discord.Member):
+	global conns, currs
+	id = int(user.id)
+	curr = curr.value
+
+	if not curr in currs:
+		await interaction.response.send_message(f"The currency `{curr}` does not exist!")
+
+	result = currs[curr].execute("SELECT bal FROM user WHERE cid=?", (id,)).fetchone()
+	if result == None:
+		currs[curr].execute("INSERT INTO user (cid, bal) VALUES (?, ?)",(id,0.0,))
+		conns[curr].commit()
+		await interaction.response.send_message(f"The balance of `{user.display_name}` is `0.0 {curr}`")
+	else:
+		bal = result[0]
+		await interaction.response.send_message(f"The balance of `{user.display_name}` is `{bal} {curr}`")
+#@balance.autocomplete("curr")
+#async def balance_curr_autocomplete(interaction: discord.Interaction, current: str) -> typing.List[app_commands.Choice[str]]:
+#	print("duck!")
+#	duck = []
+#	for currency in config.currencies:
+#		duck.append(app_commands.Choice(name=currency, value=currency))
+#	return duck
+
+def start():
+	bot.run(config["token"])
