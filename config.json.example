@@ -13,9 +13,9 @@
 			"symbol": "M"
 		}
 	],
-	"standard": "mcs",
+	"standard": 2, // mcs, remove this comment when configuring!!!
 	"api_enabled": false,
 	"api_host": "0.0.0.0",
 	"api_port": 8000,
-	"token": "token"
+	"token": ""
 }
