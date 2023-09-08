@@ -1,7 +1,21 @@
 {
-	"currencies": ["MCS", "Pur", "Spilling"],
-	"standard": "MCS",
+	"currencies": [
+		{
+			"name": "Pur",
+			"symbol": "P"
+		},
+		{
+			"name": "Spilling",
+			"symbol": "S"
+		},
+		{
+			"name": "Micronational Currency Standard",
+			"symbol": "M"
+		}
+	],
+	"standard": "mcs",
 	"api_enabled": false,
+	"api_host": "0.0.0.0",
 	"api_port": 8000,
-	"token": ""
+	"token": "token"
 }

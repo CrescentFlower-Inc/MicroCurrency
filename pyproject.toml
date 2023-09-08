@@ -11,8 +11,6 @@ discord-py = "^2.3.1"
 
 [tool.poetry.scripts]
 bot = "microcurrency.__init__:start"
-print = "microcurrency.print:start"
-burn = "microcurrency.burn:start"
 
 [build-system]
 requires = ["poetry-core"]
