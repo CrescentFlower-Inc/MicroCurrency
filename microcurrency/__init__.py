@@ -49,7 +49,7 @@ bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='exchanges | /help'))
+    await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
     print("MicroCurrency [In-Development], version dev-b14")
     await bot.tree.sync(), print(f"All commands has been synced!")
     print("Ready!")
