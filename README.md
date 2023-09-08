@@ -5,8 +5,11 @@ A discord bot that allows currency control/trades/exchanges within micronations.
 
 # HOW TO INSTALL
 ~~This bot so far only works on linux. So if you are on windows, i recommend getting WSL or a virtual machine~~
+
 Windows now works too i think!
+
 To install this bot you need:
+
 	- Atleast python 3.9 (but other versions probably would work too if you modify the code and the pyproject.toml a bit)
 	- Poetry
 	- Git

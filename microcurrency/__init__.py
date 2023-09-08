@@ -42,7 +42,6 @@ def checkBalance(currency, id):
 	return bal
 
 
-
 # Main code
 
 bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
