@@ -1,5 +1,4 @@
 # MicroCurrency
-⚠️ **DEV BRANCH** ~~ May contain unstable/untested code. It's not intended for public use.
 
 A discord bot that allows currency control/trades/exchanges within micronations.
 
@@ -10,7 +9,7 @@ Windows now works too i think!
 
 To install this bot you need:
 
-	- Atleast python 3.9 (but other versions probably would work too if you modify the code and the pyproject.toml a bit)
+	- Atleast python 3.9 (but other versions probably would work too)
 	- Poetry
 	- Git
 
@@ -24,5 +23,6 @@ poetry install
 Then also rename `config.json.example` back to `config.json` and configure your bot!
 
 # HOW TO RUN
-To run the bot, you just need to run `poetry run bot`
+To run the bot, you just need to run `poetry run bot`.
 
+If you would like to create money for a currency, use `poetry run create_money`.

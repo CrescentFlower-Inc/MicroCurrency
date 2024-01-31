@@ -10,7 +10,7 @@ python = "^3.11"
 discord-py = "^2.3.1"
 
 [tool.poetry.scripts]
-start = "microcurrency.__init__:start"
+bot = "microcurrency.__init__:bot"
 create_money = "microcurrency.scripts:create_money"
 
 [build-system]
