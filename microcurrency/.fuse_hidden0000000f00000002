@@ -1,38 +1,33 @@
 # Import modules
+from microcurrency.currency import Currency
+from microcurrency.db import Database
+
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
 from typing import List
-import sqlite3 as sl
+from pathlib import Path
 import discord, json, typing
-# Configure bot
+# Configure bot and initialize database
 
-PATH = "/".join(__file__.split("/")[:-2])+"/"
-DBS = PATH+"dbs/"
-CONFIG = PATH+"config.json"
+PATH = Path(__file__).parents[1]
+DB = PATH / "DATABASE.db"
+CONFIG = PATH / "config.json"
 
-f = open(str(CONFIG))
-config = json.loads(f.read())
-f.close()
+db = Database(DB)
 
-conns = {}
-currs = {}
-
-for database in config['currencies']:
-	conn = sl.connect(DBS+database+".db")
-	curr = conn.cursor()
-	curr.execute("CREATE TABLE IF NOT EXISTS user (aid INTEGER NOT NULL PRIMARY KEY, cid INTEGER, bal DOUBLE);")
-	curr.execute("CREATE TABLE IF NOT EXISTS transactions (tid INTEGER NOT NULL PRIMARY KEY, sid INTEGER, rid INTEGER, amt DOUBLE);")
-	conn.commit()
-	conns[database] = conn
-	currs[database] = curr
-
+with open(str(CONFIG)) as f:
+	config = json.loads(f.read())
 
 # Initialize discord.py values
 
-currchoices = []
-for curr in config["currencies"]:
-	currchoices.append(app_commands.Choice(name=curr, value=curr))
+currencies = []
+for index, rawdata in enumerate(config["currencies"]):
+	currencies.append(Currency(index, rawdata, db))
+
+curchoices = []
+for index, currency in enumerate(config["currencies"]):
+	curchoices.append(app_commands.Choice(name=currency["name"], value=index))
 
 # Main code
 
@@ -40,7 +35,7 @@ bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='exchanges | /help'))
+    await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
     print("MicroCurrency [In-Development], version dev-b14")
     await bot.tree.sync(), print(f"All commands has been synced!")
     print("Ready!")
@@ -90,32 +85,29 @@ async def strtest(interaction: discord.Interaction, user: discord.Member, amount
     elif user == interaction.user.mention: await interaction.response.send_message(embed=embed2),
     else: await interaction.response.send_message(f"This is a testing command, representing {interaction.user.name}, that wanted to give {amount} {currency} to {user.mention}.")
 
-@app_commands.describe(curr = "What currency", user = "The target user")
-@app_commands.choices(curr=currchoices)
-@bot.tree.command(name="bal",description="Gets the balance of your or somebody else's account")
-async def balance(interaction: discord.Interaction, curr: app_commands.Choice[str], user: discord.Member):
-	global conns, currs
-	id = int(user.id)
-	curr = curr.value
+@app_commands.describe(currency = "What currency", user = "The target user")
+@app_commands.choices(currency = curchoices)
+@bot.tree.command(name="bal", description="Gets the balance of your or somebody else's account")
+async def balance(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member):
+	currency = currencies[currency.value]
+	balance = currency.checkBalance(int(user.id))
 
-	if not curr in currs:
-		await interaction.response.send_message(f"The currency `{curr}` does not exist!")
+	await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
 
-	result = currs[curr].execute("SELECT bal FROM user WHERE cid=?", (id,)).fetchone()
-	if result == None:
-		currs[curr].execute("INSERT INTO user (cid, bal) VALUES (?, ?)",(id,0.0,))
-		conns[curr].commit()
-		await interaction.response.send_message(f"The balance of `{user.display_name}` is `0.0 {curr}`")
-	else:
-		bal = result[0]
-		await interaction.response.send_message(f"The balance of `{user.display_name}` is `{bal} {curr}`")
-#@balance.autocomplete("curr")
-#async def balance_curr_autocomplete(interaction: discord.Interaction, current: str) -> typing.List[app_commands.Choice[str]]:
-#	print("duck!")
-#	duck = []
-#	for currency in config.currencies:
-#		duck.append(app_commands.Choice(name=currency, value=currency))
-#	return duck
+@app_commands.describe(currency = "What currency", user = "The target user")
+@app_commands.choices(currency = curchoices)
+@bot.tree.command(name="transfer", description="Transfer money to another person")
+async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
+	currency = currencies[currency.value]
+	status = currency.createTransaction(interaction.user.id, int(user.id), amount)
+	responses = [
+		f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {int(user.display_name)}!",
+		":x: You cannot send no or negative money!",
+		":x: You cannot send money to yourself!",
+		":x: Insufficient funds"
+		
+	]
 
+	await interaction.response.send_message(respones[status])
 def start():
 	bot.run(config["token"])
