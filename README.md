@@ -26,3 +26,8 @@ Then also rename `config.json.example` back to `config.json` and configure your 
 To run the bot, you just need to run `poetry run bot`.
 
 If you would like to create money for a currency, use `poetry run create_money`.
+
+# WOULD YOU LIKE TO CONTRIBUTE?
+
+We are always accepting pull requests and we will listen to suggestions.
+If you have a question, suggestion or issue, please make a github issue or go to our support discord server.
