@@ -1,19 +1,21 @@
 {
 	"currencies": [
 		{
+			"name": "Micronational Currency Standard", // The first currency is always the standard, also remove this comment when configuring!!!
+			"symbol": "M",
+			"managers": []
+		},
+		{
 			"name": "Pur",
-			"symbol": "P"
+			"symbol": "P",
+			"managers": []
 		},
 		{
 			"name": "Spilling",
-			"symbol": "S"
-		},
-		{
-			"name": "Micronational Currency Standard",
-			"symbol": "M"
+			"symbol": "S",
+			"managers": []
 		}
 	],
-	"standard": 2, // mcs, remove this comment when configuring!!!
 	"api_enabled": false,
 	"api_host": "0.0.0.0",
 	"api_port": 8000,

@@ -1,10 +1,12 @@
 # Import modules
+from microcurrency.currency import Currency
+from microcurrency.db import Database
+
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
 from typing import List
 from pathlib import Path
-import sqlite3 as sl
 import discord, json, typing
 # Configure bot and initialize database
 
@@ -12,34 +14,20 @@ PATH = Path(__file__).parents[1]
 DB = PATH / "DATABASE.db"
 CONFIG = PATH / "config.json"
 
+db = Database(DB)
 
 with open(str(CONFIG)) as f:
 	config = json.loads(f.read())
 
-conn = sl.connect(str(DB))
-curr = conn.cursor()
-
-curr.execute("CREATE TABLE IF NOT EXISTS transactions (tid INTEGER NOT NULL PRIMARY KEY, cid INTEGER NOT NULL, sid INTEGER, rid INTEGER, amt DOUBLE);")
-conn.commit()
-
 # Initialize discord.py values
 
+currencies = []
+for index, rawdata in enumerate(config["currencies"]):
+	currencies.append(Currency(index, rawdata, db))
+
 curchoices = []
-for i, currency in enumerate(config["currencies"]):
-	curchoices.append(app_commands.Choice(name=currency["name"], value=i))
-
-# Create helper functions
-
-def checkBalance(currency, id):
-	res = curr.execute("SELECT sid, rid, amt FROM transactions WHERE cid=? AND (sid=? OR rid=?);", (currency, id, id,)).fetchall()
-	bal = 0
-	for transaction in res:
-		if transaction[0] == id:
-			bal -= transaction[2]
-		else:
-			bal += transaction[2]
-
-	return bal
+for index, currency in enumerate(config["currencies"]):
+	curchoices.append(app_commands.Choice(name=currency["name"], value=index))
 
 # Main code
 
@@ -97,38 +85,29 @@ async def strtest(interaction: discord.Interaction, user: discord.Member, amount
     elif user == interaction.user.mention: await interaction.response.send_message(embed=embed2),
     else: await interaction.response.send_message(f"This is a testing command, representing {interaction.user.name}, that wanted to give {amount} {currency} to {user.mention}.")
 
-@app_commands.describe(curr = "What currency", user = "The target user")
-@app_commands.choices(curr = curchoices)
+@app_commands.describe(currency = "What currency", user = "The target user")
+@app_commands.choices(currency = curchoices)
 @bot.tree.command(name="bal", description="Gets the balance of your or somebody else's account")
-async def balance(interaction: discord.Interaction, curr: app_commands.Choice[int], user: discord.Member):
-	global config
-	id = int(user.id)
-	curr = curr.value
-	data = checkBalance(curr,id)
+async def balance(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member):
+	currency = currencies[currency.value]
+	balance = currency.checkBalance(int(user.id))
 
-	dispname = user.display_name
-	symbol = config["currencies"][curr]["symbol"]
+	await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
 
-	await interaction.response.send_message(f"{dispname}'s balance is: `{data} {symbol}`!")
-
-@app_commands.describe(cur = "What currency", user = "The target user")
-@app_commands.choices(cur = curchoices)
+@app_commands.describe(currency = "What currency", user = "The target user")
+@app_commands.choices(currency = curchoices)
 @bot.tree.command(name="transfer", description="Transfer money to another person")
-async def transfer(interaction: discord.Interaction, cur: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
-	global config
-	id = int(user.id)
-	cur = cur.value
-	bal = checkBalance(cur,interaction.user.id)
+async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
+	currency = currencies[currency.value]
+	status = currency.createTransaction(interaction.user.id, int(user.id), amount)
+	responses = [
+		f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {int(user.display_name)}!",
+		":x: You cannot send no or negative money!",
+		":x: You cannot send money to yourself!",
+		":x: Insufficient funds"
+		
+	]
 
-	symbol = config["currencies"][cur]["symbol"]
-	dispname = user.display_name
-
-	if amount <= 0: await interaction.response.send_message(":x: You cannot send no or negative money!")
-	elif user == interaction.user: await interaction.response.send_message(":x: You cannot send money to yourself!")
-	elif bal < amount: await interaction.response.send_message(":x: Insufficient funds")
-	else:
-		curr.execute("INSERT INTO transactions (cid, sid, rid, amt) VALUES (?, ?, ?, ?);", (cur, interaction.user.id, id, amount))
-		conn.commit()
-		await interaction.response.send_message(f":white_check_mark: Succesfully transfered `{amount} {symbol}` to {dispname}!")
+	await interaction.response.send_message(respones[status])
 def start():
 	bot.run(config["token"])
