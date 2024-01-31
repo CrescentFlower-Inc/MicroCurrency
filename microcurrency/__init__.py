@@ -105,7 +105,6 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 		":x: You cannot send no or negative money!",
 		":x: You cannot send money to yourself!",
 		":x: Insufficient funds"
-		
 	]
 
 	await interaction.response.send_message(respones[status])
