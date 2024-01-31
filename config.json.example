@@ -1,7 +1,23 @@
 {
-	"currencies": ["MCS", "Pur", "Spilling"],
-	"standard": "MCS",
+	"currencies": [
+		{
+			"name": "Micronational Currency Standard", // The first currency is always the standard, also remove this comment when configuring!!!
+			"symbol": "M",
+			"managers": []
+		},
+		{
+			"name": "Pur",
+			"symbol": "P",
+			"managers": []
+		},
+		{
+			"name": "Spilling",
+			"symbol": "S",
+			"managers": []
+		}
+	],
 	"api_enabled": false,
+	"api_host": "0.0.0.0",
 	"api_port": 8000,
 	"token": ""
 }
