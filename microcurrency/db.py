@@ -41,11 +41,11 @@ class Database:
 
 		'''
 
-		if amount <= 0: return 1
-		elif user == interaction.user: return 2
-		elif bal < amount: return 3
+		if amt <= 0: return 1
+		elif sid == rid: return 2
+		elif self.checkBalance(cid, sid) < amt and sid > 0: return 3
 
-		self.curr.execute("INSERT INTO transactions (cid, sid, rid, amt) VALUES (?, ?, ?, ?)")
+		self.curr.execute("INSERT INTO transactions (cid, sid, rid, amt) VALUES (?, ?, ?, ?)", (cid, sid, rid, amt,))
 		self.conn.commit()
 
 		return 0
