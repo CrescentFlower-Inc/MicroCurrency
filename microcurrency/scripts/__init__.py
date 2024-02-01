@@ -22,7 +22,7 @@ def print_currencies():
 
 def create_money():
 	print_currencies()
-	currency_id = int(input("Enter currnecy ID: "))
+	currency_id = int(input("Enter currency ID: "))
 	receiver_id = input("Enter user ID of receiver: ")
 	amount = float(input("Enter amount you want to create: "))
 
