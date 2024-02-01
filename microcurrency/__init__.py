@@ -124,7 +124,7 @@ async def sell(interaction: discord.Interaction, currency: app_commands.Choice[i
 
 @app_commands.describe(currency = "What currency do you want to buy", amount = "How much currency do you want to buy?")
 @app_commands.choices(currency = curchoices)
-@bot.tree.command(name="buy", description="Converts your currency of choice into the standard currency.") # , scope=1138412428036685864
+@bot.tree.command(name="buy", description="Converts the standard currency into your currency of choice.") # , scope=1138412428036685864
 async def buy(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float):
 	currency = currencies[currency.value]
 	stcurrency = currencies[0]
