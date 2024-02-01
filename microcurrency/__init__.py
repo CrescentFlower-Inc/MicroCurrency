@@ -1,6 +1,7 @@
 # Import modules
 from microcurrency.currency import Currency
 from microcurrency.db import Database
+from microcurrency.exchange import Exchange
 
 from discord import app_commands
 from discord.ext import commands
@@ -14,10 +15,11 @@ PATH = Path(__file__).parents[1]
 DB = PATH / "DATABASE.db"
 CONFIG = PATH / "config.json"
 
-db = Database(DB)
-
 with open(str(CONFIG)) as f:
 	config = json.loads(f.read())
+
+db = Database(DB)
+# exchange = Exchange(0, Currency(0, config["currencies"][0], db))
 
 # Initialize discord.py values
 
@@ -35,10 +37,13 @@ bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
-    print("MicroCurrency [In-Development], version dev-b14")
-    await bot.tree.sync(), print(f"All commands has been synced!")
-    print("Ready!")
+	print("MicroCurrency [In-Development], version dev-b14")
+	await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
+	await bot.tree.sync()
+
+	# exchange.id = bot.user.id
+
+	print("Ready!")
 
 @bot.tree.command(name="help",description="List of all commands available on the bot.")
 async def help(interaction: discord.Interaction):
@@ -60,7 +65,7 @@ async def embtest(interaction: discord.Interaction):
 @bot.tree.command(name="bal", description="Gets the balance of your or somebody else's account")
 async def balance(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member):
 	currency = currencies[currency.value]
-	balance = currency.checkBalance(int(user.id))
+	balance = currency.getBalance(int(user.id))
 
 	await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
 
@@ -78,5 +83,21 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 	]
 
 	await interaction.response.send_message(respones[status])
+
+# @app_commands.describe(currency = "What currency you want to see the exchange rates of")
+# @app_commands.choices(currency = curchoices)
+# @bot.tree.command(name="exchangerates", description="Get buy/sell rates for the standard currency.")
+# async def exchange_rates(interaction: discord.Interaction, currency: app_commands.Choice[int]):
+# 	currency = currencies[currency.value]
+# 	stcurrency = currencies[0]
+
+# 	standardV, other = exchange.getExchangeRates(currency)
+
+# 	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and {stcurrency.name}
+
+# 		{stcurrency.symbol} {standardV} = {currency.symbol} 1
+# 		{stcurrency.symbol} 1 = {other} {currency.symbol}
+# 	''')
+
 def start():
 	bot.run(config["token"])

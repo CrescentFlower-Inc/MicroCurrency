@@ -16,7 +16,7 @@ class Database:
 
 		return True, res[0]
 
-	def checkBalance(self, cid, id):
+	def getBalance(self, cid, id):
 		res = self.curr.execute("SELECT sid, rid, amt FROM transactions WHERE cid=? AND (sid=? OR rid=?);", (cid, id, id,)).fetchall()
 		bal = 0
 		for transaction in res:
@@ -43,7 +43,7 @@ class Database:
 
 		if amt <= 0: return 1
 		elif sid == rid: return 2
-		elif self.checkBalance(cid, sid) < amt and sid > 0: return 3
+		elif self.getBalance(cid, sid) < amt and sid > 0: return 3
 
 		self.curr.execute("INSERT INTO transactions (cid, sid, rid, amt) VALUES (?, ?, ?, ?)", (cid, sid, rid, amt,))
 		self.conn.commit()

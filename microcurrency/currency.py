@@ -16,8 +16,8 @@ class Currency:
 		self.managers = raw["managers"]
 		self.db = db
 
-	def checkBalance(self, userid):
-		return self.db.checkBalance(self.id, userid)
+	def getBalance(self, userid):
+		return self.db.getBalance(self.id, userid)
 
 	def getTransaction(self, tid):
 		status, rawt = self.db.getTransactionById(tid)
