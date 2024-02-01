@@ -79,7 +79,7 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 		f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {int(user.display_name)}!",
 		":x: You cannot send no or negative money!",
 		":x: You cannot send money to yourself!",
-		":x: Insuffici;ent funds"
+		":x: Insufficient funds"
 	]
 
 	await interaction.response.send_message(respones[status])
@@ -95,13 +95,31 @@ async def exchange_rates(interaction: discord.Interaction, currency: app_command
 		await interaction.response.send_message(f"`{currency.symbol} 1 = {currency.symbol} 1`, duck!")
 		return
 
-	standardV, other = exchange.getExchangeRates(currency)
+	standardRate, otherRate = exchange.getExchangeRates(currency)
 
 	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and `{stcurrency.name}`
 
-```{standardV} {stcurrency.symbol} = 1 {currency.symbol}
-1 {stcurrency.symbol} = {other} {currency.symbol}```
+```{standardRate} {stcurrency.symbol} = 1 {currency.symbol}
+1 {stcurrency.symbol} = {otherRate} {currency.symbol}```
 	''')
+
+@app_commands.describe(currency = "What currency do you want to sell", amount = "How much do you want to sell?")
+@app_commands.choices(currency = curchoices)
+@bot.tree.command(name="sell", description="Converts your currency of choice into the standard currency.") # , scope=1138412428036685864
+async def sell(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float):
+	currency = currencies[currency.value]
+	stcurrency = currencies[0]
+	standardRate, _ = exchange.getExchangeRates(currency)
+	status, exchanged = exchange.exchange(interaction.user.id, standardRate, amount, currency, stcurrency)
+
+	responses = [
+		f":white_check_mark: Succesfully sold `{amount} {currency.symbol}` for `{exchanged} {stcurrency.symbol}`!",
+		f":x: You cannot sell `{currency.name}` for `{currency.name}`",
+		":x: You cannot afford the transaction or have entered in the wrong information!",
+		f":x: Couldn't send `{exchanged} {currency.symbol}`, contact a microcurrency dev immediately!"
+	]
+
+	await interaction.response.send_message(responses[status])
 
 def start():
 	bot.run(config["token"])
