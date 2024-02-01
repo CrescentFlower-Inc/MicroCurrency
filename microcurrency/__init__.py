@@ -19,7 +19,7 @@ with open(str(CONFIG)) as f:
 	config = json.loads(f.read())
 
 db = Database(DB)
-# exchange = Exchange(0, Currency(0, config["currencies"][0], db))
+exchange = Exchange(0, Currency(0, config["currencies"][0], db))
 
 # Initialize discord.py values
 
@@ -41,7 +41,7 @@ async def on_ready():
 	await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
 	await bot.tree.sync()
 
-	# exchange.id = bot.user.id
+	exchange.id = bot.user.id
 
 	print("Ready!")
 
@@ -84,20 +84,24 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 
 	await interaction.response.send_message(respones[status])
 
-# @app_commands.describe(currency = "What currency you want to see the exchange rates of")
-# @app_commands.choices(currency = curchoices)
-# @bot.tree.command(name="exchangerates", description="Get buy/sell rates for the standard currency.")
-# async def exchange_rates(interaction: discord.Interaction, currency: app_commands.Choice[int]):
-# 	currency = currencies[currency.value]
-# 	stcurrency = currencies[0]
+@app_commands.describe(currency = "What currency you want to see the exchange rates of")
+@app_commands.choices(currency = curchoices)
+@bot.tree.command(name="exchangerates", description="Get buy/sell rates for the standard currency.")
+async def exchange_rates(interaction: discord.Interaction, currency: app_commands.Choice[int]):
+	currency = currencies[currency.value]
+	stcurrency = currencies[0]
 
-# 	standardV, other = exchange.getExchangeRates(currency)
+	if currency == stcurrency:
+		await interaction.response.send_message(f"`{currency.symbol} 1 = {currency.symbol} 1`, duck!")
+		return
 
-# 	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and {stcurrency.name}
+	standardV, other = exchange.getExchangeRates(currency)
 
-# 		{stcurrency.symbol} {standardV} = {currency.symbol} 1
-# 		{stcurrency.symbol} 1 = {other} {currency.symbol}
-# 	''')
+	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and `{stcurrency.name}`
+
+```{standardV} {stcurrency.symbol} = 1 {currency.symbol}
+1 {stcurrency.symbol} = {other} {currency.symbol}```
+	''')
 
 def start():
 	bot.run(config["token"])
