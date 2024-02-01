@@ -116,10 +116,30 @@ async def sell(interaction: discord.Interaction, currency: app_commands.Choice[i
 		f":white_check_mark: Succesfully sold `{amount} {currency.symbol}` for `{exchanged} {stcurrency.symbol}`!",
 		f":x: You cannot sell `{currency.name}` for `{currency.name}`",
 		":x: You cannot afford the transaction or have entered in the wrong information!",
+		f":x: Couldn't send `{exchanged} {stcurrency.symbol}`, contact a microcurrency dev immediately!"
+	]
+
+	await interaction.response.send_message(responses[status])
+
+
+@app_commands.describe(currency = "What currency do you want to buy", amount = "How much currency do you want to buy?")
+@app_commands.choices(currency = curchoices)
+@bot.tree.command(name="buy", description="Converts your currency of choice into the standard currency.") # , scope=1138412428036685864
+async def buy(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float):
+	currency = currencies[currency.value]
+	stcurrency = currencies[0]
+	_, otherRate = exchange.getExchangeRates(currency)
+	status, exchanged = exchange.exchange(interaction.user.id, otherRate, amount, stcurrency, currency)
+
+	responses = [
+		f":white_check_mark: Succesfully bought `{exchanged} {currency.symbol}` for `{amount} {stcurrency.symbol}`!",
+		f":x: You cannot buy `{currency.name}` for `{currency.name}`",
+		":x: You cannot afford the transaction or have entered in the wrong information!",
 		f":x: Couldn't send `{exchanged} {currency.symbol}`, contact a microcurrency dev immediately!"
 	]
 
 	await interaction.response.send_message(responses[status])
+
 
 def start():
 	bot.run(config["token"])
