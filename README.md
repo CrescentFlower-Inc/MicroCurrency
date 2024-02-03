@@ -2,6 +2,12 @@
 
 A discord bot that allows currency control/trades/exchanges within micronations.
 
+# TODO:
+[ ] Remove inconsistencies
+[ ] Polish commands in order for them to be nicely formatted in embeds
+[ ] Make command names better
+[ ] API documentation
+
 # HOW TO INSTALL
 ~~This bot so far only works on linux. So if you are on windows, i recommend getting WSL or a virtual machine~~
 
