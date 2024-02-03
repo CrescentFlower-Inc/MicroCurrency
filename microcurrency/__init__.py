@@ -8,7 +8,7 @@ from discord.ext import commands
 from datetime import datetime
 from typing import List
 from pathlib import Path
-import discord, json, typing, uvicorn
+import discord, json, typing, uvicorn, threading
 # Configure bot and initialize database
 
 PATH = Path(__file__).parents[1]
@@ -147,4 +147,6 @@ async def create_token(interaction: discord.Interaction):
 	await interaction.response.send_message(f"Your new API token is: `{tok}`\nFor security purposes, API token can only be shown **once**.\nIf you lose it, you will have to regenerate it with the same command.", ephemeral=True)
 
 def start():
-	bot.run(config["token"])
+	threading.Thread(daemon=True, target=bot.run, args=(config["token"],)).start()
+	if config["api"]["enabled"]:
+		uvicorn.run("microcurrency.api:app", host=config["api"]["host"], port=config["api"]["port"], reload=config["api"]["reload"])

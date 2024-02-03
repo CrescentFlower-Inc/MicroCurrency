@@ -6,7 +6,7 @@ import json
 db_path = str(  Path(__file__).parents[1] / "DATABASE.db"  )
 db = Database(db_path)
 
-with open(Path(__file__).parents[1] / "config.json"):
+with open(Path(__file__).parents[1] / "config.json") as f:
 	config = json.loads(f.read())
 
 app = FastAPI()
