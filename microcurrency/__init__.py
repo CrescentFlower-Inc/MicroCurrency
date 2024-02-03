@@ -8,7 +8,7 @@ from discord.ext import commands
 from datetime import datetime
 from typing import List
 from pathlib import Path
-import discord, json, typing, uvicorn, threading
+import discord, json, typing, uvicorn, threading, time, contextlib
 # Configure bot and initialize database
 
 PATH = Path(__file__).parents[1]
@@ -74,15 +74,15 @@ async def balance(interaction: discord.Interaction, currency: app_commands.Choic
 @bot.tree.command(name="transfer", description="Transfer money to another person")
 async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
 	currency = currencies[currency.value]
-	status = currency.createTransaction(interaction.user.id, int(user.id), amount)
+	status = currency.createTransaction(interaction.user.id, user.id, amount)
 	responses = [
-		f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {int(user.display_name)}!",
+		f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {user.display_name}!",
 		":x: You cannot send no or negative money!",
 		":x: You cannot send money to yourself!",
 		":x: Insufficient funds"
 	]
 
-	await interaction.response.send_message(respones[status])
+	await interaction.response.send_message(responses[status])
 
 @app_commands.describe(currency = "What currency you want to see the exchange rates of")
 @app_commands.choices(currency = curchoices)
@@ -146,7 +146,35 @@ async def create_token(interaction: discord.Interaction):
 
 	await interaction.response.send_message(f"Your new API token is: `{tok}`\nFor security purposes, API token can only be shown **once**.\nIf you lose it, you will have to regenerate it with the same command.", ephemeral=True)
 
+####### uvicorn stuff
+
+class Server(uvicorn.Server):
+	def install_signal_handlers(self):
+		pass
+
+	@contextlib.contextmanager
+	def run_in_thread(self):
+		thread = threading.Thread(target=self.run)
+		thread.start()
+		try:
+			while not self.started:
+				time.sleep(1e-3)
+			yield
+		finally:
+			self.should_exit = True
+			thread.join()
+
+uconfig = uvicorn.Config("microcurrency.api:app", host=config["api"]["host"], port=config["api"]["port"], reload=config["api"]["reload"])
+server = Server(config=uconfig)
+
+#######
+
+
 def start():
-	threading.Thread(daemon=True, target=bot.run, args=(config["token"],)).start()
 	if config["api"]["enabled"]:
-		uvicorn.run("microcurrency.api:app", host=config["api"]["host"], port=config["api"]["port"], reload=config["api"]["reload"])
+		with server.run_in_thread():
+			bot.run(config["token"])
+		# threading.Thread(daemon=True, target=bot.run, args=(config["token"],)).start()
+		# uvicorn.run("microcurrency.api:app", host=config["api"]["host"], port=config["api"]["port"], reload=config["api"]["reload"])
+	else:
+		bot.run(config["token"])

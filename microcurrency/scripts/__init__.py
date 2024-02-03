@@ -29,3 +29,9 @@ def create_money():
 	code = db.createTransaction(currency_id, 0, receiver_id, amount)
 
 	print(f"Exiting with code {code}")
+
+def get_transactions():
+	print("Transaction printer 3000")
+	print("tid		cid		sid		rid		amt	")
+	for transaction in db.getTransactions():
+		print(f"{transaction[0]} {transaction[1]} {transaction[2]} {transaction[3]} {transaction[4]}")

@@ -14,6 +14,7 @@ uvicorn = "^0.27.0.post1"
 [tool.poetry.scripts]
 bot = "microcurrency.__init__:start"
 create_money = "microcurrency.scripts:create_money"
+get_transactions = "microcurrency.scripts:get_transactions"
 
 [build-system]
 requires = ["poetry-core"]

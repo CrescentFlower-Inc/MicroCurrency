@@ -40,6 +40,9 @@ class Database:
 
 		return True, res[0]
 
+	def getTransactions(self):
+		return (x for x in self.curr.execute("SELECT * FROM transactions").fetchall())
+
 	def getBalance(self, cid, id):
 		res = self.curr.execute("SELECT sid, rid, amt FROM transactions WHERE cid=? AND (sid=? OR rid=?);", (cid, id, id,)).fetchall()
 		bal = 0
