@@ -2,16 +2,13 @@
 
 A discord bot that allows currency control/trades/exchanges within micronations.
 
-# TODO:
+# To-Do:
 - [ ] Remove inconsistencies
 - [ ] Polish commands in order for them to be nicely formatted in embeds
 - [ ] Make command names better
 - [ ] API documentation
 
-# HOW TO INSTALL
-~~This bot so far only works on linux. So if you are on windows, i recommend getting WSL or a virtual machine~~
-
-Windows now works too i think!
+# How to install
 
 To install this bot you need:
 
@@ -28,12 +25,12 @@ poetry install
 ```
 Then also rename `config.json.example` back to `config.json` and configure your bot!
 
-# HOW TO RUN
+# How to run
 To run the bot, you just need to run `poetry run bot`.
 
 If you would like to create money for a currency, use `poetry run create_money`.
 
-# WOULD YOU LIKE TO CONTRIBUTE?
+# Would you like to contribute?
 
 We are always accepting pull requests and we will listen to suggestions.
-If you have a question, suggestion or issue, please make a github issue or go to our support discord server.
+If you have a question, suggestion or issue, please make a [github issue](https://github.com/CrescentFlower-Inc/MicroCurrency/issues) or join our [discord support server](https://discord.gg/5qarCfy5de).
