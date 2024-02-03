@@ -8,7 +8,7 @@ from discord.ext import commands
 from datetime import datetime
 from typing import List
 from pathlib import Path
-import discord, json, typing
+import discord, json, typing, uvicorn
 # Configure bot and initialize database
 
 PATH = Path(__file__).parents[1]
