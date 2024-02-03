@@ -144,7 +144,7 @@ async def buy(interaction: discord.Interaction, currency: app_commands.Choice[in
 async def create_token(interaction: discord.Interaction):
 	tok = db.createAPIToken(interaction.user.id)
 
-	await interaction.response.send_message(f"Your new API token is: `{tok}`\nThis will be the only time you will get to see it, if you lose it you will have to regenerate it with the same command.", ephemeral=True)
+	await interaction.response.send_message(f"Your new API token is: `{tok}`\nFor security purposes, API token can only be shown **once**.\nIf you lose it, you will have to regenerate it with the same command.", ephemeral=True)
 
 def start():
 	bot.run(config["token"])
