@@ -6,6 +6,9 @@ import json
 db_path = str(  Path(__file__).parents[1] / "DATABASE.db"  )
 db = Database(db_path)
 
+with open(Path(__file__).parents[1] / "config.json"):
+	config = json.loads(f.read())
+
 app = FastAPI()
 
 @app.get('/api/balance')
@@ -40,7 +43,9 @@ async def transaction(request: Request):
 	except KeyError as e:
 		return {"success": False, "error": f"Missing {e} field."}
 
-
+@app.get("/api/list_currencies")
+async def list():
+	return {"success": True, "currencies": config["currencies"]}
 
 @app.get("/api")
 async def root():
