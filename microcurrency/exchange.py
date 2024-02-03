@@ -1,4 +1,6 @@
 # This file handles exchanges
+from microcurrency.enum import *
+
 
 class Exchange:
 	def __init__(self, id, standard):
@@ -24,7 +26,7 @@ class Exchange:
 
 	def exchange(self, userid, rate, amount, recvcurr, sendcurr):
 		if recvcurr == sendcurr:
-			return 1, 0
+			return EXCHANGE_RESPONSES.EXCHANGING_STANDARD_FOR_STANDARD, 0
 
 		# standardRate, _ = exchange.getExchangeRates(currency)
 
@@ -33,11 +35,11 @@ class Exchange:
 		code = recvcurr.createTransaction(userid, self.id, amount)
 
 		if not code == 0:
-			return 2, 0
+			return EXCHANGE_RESPONSES.TRANSACTION_FAILED_ON_USERS_END, 0
 
 		code = sendcurr.createTransaction(self.id, userid, exchanged)
 
 		if not code == 0:
-			return 3, 0
+			return EXCHANGE_RESPONSES.TRANSACTION_FAILED_ON_BOTS_END, 0
 
-		return 0, exchanged
+		return EXCHANGE_RESPONSES.SUCCESS, exchanged

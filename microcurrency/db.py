@@ -1,4 +1,5 @@
 # I def gotta switch to an ORM later
+from microcurrency.enum import *
 from hashlib import sha512
 import sqlite3 as sl
 import random
@@ -56,11 +57,11 @@ class Database:
 
 		'''
 
-		if amt <= 0: return 1
-		elif sid == rid: return 2
-		elif self.getBalance(cid, sid) < amt and sid > 0: return 3
+		if amt <= 0: return TRANSACTION.RESPONSES.NEGATIVE_AMOUNT
+		elif sid == rid: return TRANSACTION_RESPONSES.SELF_SEND
+		elif self.getBalance(cid, sid) < amt and sid > 0: return TRANSACTION_RESPONSES.INSUFFICIENT_FUNDS
 
 		self.curr.execute("INSERT INTO transactions (cid, sid, rid, amt) VALUES (?, ?, ?, ?)", (cid, sid, rid, amt,))
 		self.conn.commit()
 
-		return 0
+		return TRANSACTION_RESPONSES.SUCCESS
