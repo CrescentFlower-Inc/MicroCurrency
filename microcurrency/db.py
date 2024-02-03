@@ -26,6 +26,14 @@ class Database:
 
 		return token
 
+	def authenticate(self, token):
+		hashed = sha512(token.encode('utf-8')).hexdigest()
+		dbresp = self.curr.execute("SELECT * FROM apitokens WHERE token=?",(hashed,)).fetchone()
+		if dbresp == None:
+			return False, 0
+
+		return True, dbresp[0]
+
 	def getTransactionByID(self, tid):
 		res = curr.execute("SELECT * FROM transactions WHERE tid=?").fetchall()
 		if len(res) == 0: return False, None
