@@ -80,14 +80,31 @@ async def balance(interaction: discord.Interaction, currency: app_commands.Choic
 async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
 	currency = currencies[currency.value]
 	status = currency.createTransaction(interaction.user.id, user.id, amount)
+	# responses_title = [
+	# 	f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {user.display_name}!",
+	# 	":x: You cannot send no or negative money!",
+	# 	":x: You cannot send money to yourself!",
+	# 	":x: Insufficient funds"
+	# ]
+
 	responses = [
-		f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {user.display_name}!",
-		":x: You cannot send no or negative money!",
-		":x: You cannot send money to yourself!",
-		":x: Insufficient funds"
+		f"Succesfully transfered {amount} {currency.symbol} to {user.display_name}",
+		"You cannot send no or negative money!",
+		"You cannot send money to yourself!",
+		"You have insufficient funds!"
 	]
 
-	await interaction.response.send_message(responses[status])
+	color = [0x00ff00, 0xff0000][status>0] # if status>0 is true, index "1" gets set into color (aka the red hex code), if it's false then index "0" gets set into color (aka green hex code)
+	title = [":white_check_mark: Transaction completed", ":x: Transaction failed"][status>0] # same thing with color
+
+	embed = discord.Embed(title=title, color=color, description=responses[status])
+	await interaction.response.send_message(embeds=[embed])
+
+
+
+	embed = discord.Embed
+
+	# await interaction.response.send_message(responses[status])
 
 @app_commands.describe(currency = "What currency you want to see the exchange rates of")
 @app_commands.choices(currency = curchoices)
