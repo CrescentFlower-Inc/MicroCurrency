@@ -68,7 +68,7 @@ class Database:
 
 		'''
 
-		if amt <= 0: return TRANSACTION.RESPONSES.NEGATIVE_AMOUNT
+		if amt <= 0: return TRANSACTION_RESPONSES.NEGATIVE_AMOUNT
 		elif sid == rid: return TRANSACTION_RESPONSES.SELF_SEND
 		elif self.getBalance(cid, sid) < amt and sid > 0: return TRANSACTION_RESPONSES.INSUFFICIENT_FUNDS
 
