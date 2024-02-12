@@ -100,10 +100,6 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 	embed = discord.Embed(title=title, color=color, description=responses[status])
 	await interaction.response.send_message(embeds=[embed])
 
-
-
-	embed = discord.Embed
-
 	# await interaction.response.send_message(responses[status])
 
 @app_commands.describe(currency = "What currency you want to see the exchange rates of")
