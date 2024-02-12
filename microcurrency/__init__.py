@@ -60,14 +60,19 @@ async def embtest(interaction: discord.Interaction):
  embed.set_footer(text="Violating any of the rules might result to your bank account reset or terminated.")
  await interaction.response.send_message(embed=embed)
 
-@app_commands.describe(currency = "What currency", user = "The target user")
+@app_commands.describe(currency = "In what currency would you like to view?", user = "Who's balance would you like to view?")
 @app_commands.choices(currency = curchoices)
-@bot.tree.command(name="bal", description="Gets the balance of your or somebody else's account")
-async def balance(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member):
+@bot.tree.command(name="balance", description="Gets the balance of your or somebody else's account")
+async def balance(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member=None):
+	if user == None: user = interaction.user
 	currency = currencies[currency.value]
 	balance = currency.getBalance(int(user.id))
 
-	await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
+	embed = discord.Embed(description=f"{balance} {currency.symbol}", color=0x00ff00)
+	embed.set_author(name=user.display_name, icon_url=user.avatar.url.split("?")[0])
+	await interaction.response.send_message(embeds=[embed])
+
+	# await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
 
 @app_commands.describe(currency = "What currency", user = "The target user")
 @app_commands.choices(currency = curchoices)
