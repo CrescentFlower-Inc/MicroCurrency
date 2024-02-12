@@ -69,7 +69,7 @@ async def balance(interaction: discord.Interaction, currency: app_commands.Choic
 	balance = currency.getBalance(int(user.id))
 
 	embed = discord.Embed(description=f"{balance} {currency.symbol}", color=0x00ff00)
-	embed.set_author(name=user.display_name, icon_url=user.avatar.url.split("?")[0])
+	embed.set_author(name=user.display_name, icon_url=user.display_avatar.url.split("?")[0])
 	await interaction.response.send_message(embeds=[embed])
 
 	# await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
@@ -102,24 +102,63 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 
 	# await interaction.response.send_message(responses[status])
 
-@app_commands.describe(currency = "What currency you want to see the exchange rates of")
-@app_commands.choices(currency = curchoices)
-@bot.tree.command(name="exchangerates", description="Get buy/sell rates for the standard currency.")
-async def exchange_rates(interaction: discord.Interaction, currency: app_commands.Choice[int]):
-	currency = currencies[currency.value]
+# @app_commands.describe(currency = "What currency you want to see the exchange rates of")
+# @app_commands.choices(currency = curchoices)
+# @bot.tree.command(name="exchangerates", description="Get buy/sell rates for the standard currency.")
+# async def exchange_rates(interaction: discord.Interaction, currency: app_commands.Choice[int]):
+# 	currency = currencies[currency.value]
+# 	stcurrency = currencies[0]
+
+# 	if currency == stcurrency:
+# 		await interaction.response.send_message(f"`{currency.symbol} 1 = {currency.symbol} 1`, duck!")
+# 		return
+
+# 	standardRate, otherRate = exchange.getExchangeRates(currency)
+
+# 	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and `{stcurrency.name}`
+
+# ```{standardRate} {stcurrency.symbol} = 1 {currency.symbol}
+# 1 {stcurrency.symbol} = {otherRate} {currency.symbol}```
+# 	''')
+
+@app_commands.describe(currency1 = "What currency you want to see the value of", currency2 = "The currency in which the value is portrayed")
+@app_commands.choices(currency1 = curchoices, currency2 = curchoices)
+@bot.tree.command(name="exchangerates", description="Get the exchange rates of two currencies")
+async def exchange_rates(interaction: discord.Interaction, currency1: app_commands.Choice[int], currency2: app_commands.Choice[int]):
+	#
+	# Example:
+	# 	- CurrencyA = Pur
+	#	- CurrencyB = Spilling
+
+	#
+	#   Expected output: 1 Pur = x MCS
+	#					 x MCS = y Spilling
+	# 					 1 Pur = x MCS = y Spilling
+	#					 1 Pur = y Spilling
+
+
+	currencyA = currencies[currency1.value]
+	currencyB = currencies[currency2.value]
 	stcurrency = currencies[0]
 
-	if currency == stcurrency:
-		await interaction.response.send_message(f"`{currency.symbol} 1 = {currency.symbol} 1`, duck!")
+	# Stage 1, convert currencyA into standard currency
+
+	standardRate, _ = exchange.getExchangeRates(currencyA)
+
+	if currencyB == stcurrency: # in case we want 1 CurrencyA = x MCS
+		embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {standardRate} {currencyB.symbol}", color=0x00ff00)
+		await interaction.response.send_message(embeds=[embed])
 		return
 
-	standardRate, otherRate = exchange.getExchangeRates(currency)
+	# Stage 2, convert x MCS into y CurrencyB
 
-	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and `{stcurrency.name}`
+	_, otherRate = exchange.getExchangeRates(currencyB)
+	combinedRate = standardRate * otherRate
 
-```{standardRate} {stcurrency.symbol} = 1 {currency.symbol}
-1 {stcurrency.symbol} = {otherRate} {currency.symbol}```
-	''')
+	embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {combinedRate} {currencyB.symbol}", color=0x00ff00)
+	await interaction.response.send_message(embeds=[embed])
+
+
 
 @app_commands.describe(currency = "What currency do you want to sell", amount = "How much do you want to sell?")
 @app_commands.choices(currency = curchoices)
