@@ -19,14 +19,14 @@ class Exchange:
 	'''
 	More codes!!!
 		0 - Succesful exchange
-		1 - exchanging standard for standard
+		1 - currencyA == currencyB
 		2 - End-User cant make that transaction
 		3 - Bot cant afford, time to panic!
 	'''
 
-	def exchange(self, userid, rate, amount, recvcurr, sendcurr):
+	def exchange(self, userid, rate, amount, sendcurr, recvcurr):
 		if recvcurr == sendcurr:
-			return EXCHANGE_RESPONSES.EXCHANGING_STANDARD_FOR_STANDARD, 0
+			return EXCHANGE_RESPONSES.CURRENCYA_IS_CURRENCYB, 0
 
 		# standardRate, _ = exchange.getExchangeRates(currency)
 
@@ -35,11 +35,13 @@ class Exchange:
 		code = recvcurr.createTransaction(userid, self.id, amount)
 
 		if not code == 0:
+			print(f"{userid} tried exchanging {amount} {recvcurr.symbol} to {sendcurr.symbol} with code {code}")
 			return EXCHANGE_RESPONSES.TRANSACTION_FAILED_ON_USERS_END, 0
 
 		code = sendcurr.createTransaction(self.id, userid, exchanged)
 
 		if not code == 0:
+			recvcurr.createTransaction(self.id, userid, amount) # refund
 			return EXCHANGE_RESPONSES.TRANSACTION_FAILED_ON_BOTS_END, 0
 
 		return EXCHANGE_RESPONSES.SUCCESS, exchanged
