@@ -72,20 +72,12 @@ async def balance(interaction: discord.Interaction, currency: app_commands.Choic
 	embed.set_author(name=user.display_name, icon_url=user.display_avatar.url.split("?")[0])
 	await interaction.response.send_message(embeds=[embed])
 
-	# await interaction.response.send_message(f"{user.display_name}'s balance is: `{balance} {currency.symbol}`!")
-
 @app_commands.describe(currency = "What currency", user = "The target user")
 @app_commands.choices(currency = curchoices)
 @bot.tree.command(name="transfer", description="Transfer money to another person")
 async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
 	currency = currencies[currency.value]
 	status = currency.createTransaction(interaction.user.id, user.id, amount)
-	# responses_title = [
-	# 	f":white_check_mark: Succesfully transfered {amount} {currency.symbol} to {user.display_name}!",
-	# 	":x: You cannot send no or negative money!",
-	# 	":x: You cannot send money to yourself!",
-	# 	":x: Insufficient funds"
-	# ]
 
 	responses = [
 		f"Succesfully transfered {amount} {currency.symbol} to {user.display_name}",
@@ -100,62 +92,14 @@ async def transfer(interaction: discord.Interaction, currency: app_commands.Choi
 	embed = discord.Embed(title=title, color=color, description=responses[status])
 	await interaction.response.send_message(embeds=[embed])
 
-	# await interaction.response.send_message(responses[status])
-
-# @app_commands.describe(currency = "What currency you want to see the exchange rates of")
-# @app_commands.choices(currency = curchoices)
-# @bot.tree.command(name="exchangerates", description="Get buy/sell rates for the standard currency.")
-# async def exchange_rates(interaction: discord.Interaction, currency: app_commands.Choice[int]):
-# 	currency = currencies[currency.value]
-# 	stcurrency = currencies[0]
-
-# 	if currency == stcurrency:
-# 		await interaction.response.send_message(f"`{currency.symbol} 1 = {currency.symbol} 1`, duck!")
-# 		return
-
-# 	standardRate, otherRate = exchange.getExchangeRates(currency)
-
-# 	await interaction.response.send_message(f'''Exchange rates of `{currency.name}` and `{stcurrency.name}`
-
-# ```{standardRate} {stcurrency.symbol} = 1 {currency.symbol}
-# 1 {stcurrency.symbol} = {otherRate} {currency.symbol}```
-# 	''')
 
 @app_commands.describe(currency1 = "What currency you want to see the value of", currency2 = "The currency in which the value is portrayed")
 @app_commands.choices(currency1 = curchoices, currency2 = curchoices)
 @bot.tree.command(name="exchangerates", description="Get the exchange rates of two currencies")
 async def exchange_rates(interaction: discord.Interaction, currency1: app_commands.Choice[int], currency2: app_commands.Choice[int]):
-	#
-	# Example:
-	# 	- CurrencyA = Pur
-	#	- CurrencyB = Spilling
-
-	#
-	#   Expected output: 1 Pur = x MCS
-	#					 x MCS = y Spilling
-	# 					 1 Pur = x MCS = y Spilling
-	#					 1 Pur = y Spilling
-
 
 	currencyA = currencies[currency1.value]
 	currencyB = currencies[currency2.value]
-	# stcurrency = currencies[0]
-
-	# # Stage 1, convert currencyA into standard currency
-
-	# standardRate, _ = exchange.getExchangeRates(currencyA)
-
-	# if currencyB == stcurrency: # in case we want 1 CurrencyA = x MCS
-	# 	embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {standardRate} {currencyB.symbol}", color=0x00ff00)
-	# 	await interaction.response.send_message(embeds=[embed])
-	# 	return
-
-	# # Stage 2, convert x MCS into y CurrencyB
-
-	# _, otherRate = exchange.getExchangeRates(currencyB)
-	# combinedRate = standardRate * otherRate
-
-	# embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {combinedRate} {currencyB.symbol}", color=0x00ff00)
 
 	rate_AB, rate_BA = exchange.getExchangeRates(currencyA, currencyB)
 	embed = discord.Embed(title="Exchange Rates", description=f"Here are the buy and sell rates of `{currencyA.name}` and `{currencyB.name}`", color=0x00ff00)
@@ -187,45 +131,6 @@ async def _exchange(interaction: discord.Interaction, currency1: app_commands.Ch
 	await interaction.response.send_message(embeds=[embed])
 
 
-
-
-
-# @app_commands.describe(currency = "What currency do you want to sell", amount = "How much do you want to sell?")
-# @app_commands.choices(currency = curchoices)
-# @bot.tree.command(name="sell", description="Converts your currency of choice into the standard currency.") # , scope=1138412428036685864
-# async def sell(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float):
-# 	currency = currencies[currency.value]
-# 	stcurrency = currencies[0]
-# 	standardRate, _ = exchange.getExchangeRates(currency)
-# 	status, exchanged = exchange.exchange(interaction.user.id, standardRate, amount, currency, stcurrency)
-
-# 	responses = [
-# 		f":white_check_mark: Succesfully sold `{amount} {currency.symbol}` for `{exchanged} {stcurrency.symbol}`!",
-# 		f":x: You cannot sell `{currency.name}` for `{currency.name}`",
-# 		":x: You cannot afford the transaction or have entered in the wrong information!",
-# 		f":x: Couldn't send `{exchanged} {stcurrency.symbol}`, contact a microcurrency dev immediately!"
-# 	]
-
-# 	await interaction.response.send_message(responses[status])
-
-
-# @app_commands.describe(currency = "What currency do you want to buy", amount = "How much currency do you want to buy?")
-# @app_commands.choices(currency = curchoices)
-# @bot.tree.command(name="buy", description="Converts the standard currency into your currency of choice.") # , scope=1138412428036685864
-# async def buy(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float):
-# 	currency = currencies[currency.value]
-# 	stcurrency = currencies[0]
-# 	_, otherRate = exchange.getExchangeRates(currency)
-# 	status, exchanged = exchange.exchange(interaction.user.id, otherRate, amount, stcurrency, currency)
-
-# 	responses = [
-# 		f":white_check_mark: Succesfully bought `{exchanged} {currency.symbol}` for `{amount} {stcurrency.symbol}`!",
-# 		f":x: You cannot buy `{currency.name}` for `{currency.name}`",
-# 		":x: You cannot afford the transaction or have entered in the wrong information!",
-# 		f":x: Couldn't send `{exchanged} {currency.symbol}`, contact a microcurrency dev immediately!"
-# 	]
-
-# 	await interaction.response.send_message(responses[status])
 
 @bot.tree.command(name="create_token", description="Creates or regenerates an API token for you.")
 async def create_token(interaction: discord.Interaction):
