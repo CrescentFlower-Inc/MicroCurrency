@@ -28,15 +28,12 @@ class Exchange:
 		if recvcurr == sendcurr:
 			return EXCHANGE_RESPONSES.CURRENCYA_IS_CURRENCYB, 0
 
-		# standardRate, _ = exchange.getExchangeRates(currency)
-
 		exchanged = rate*amount
-
 		code = recvcurr.createTransaction(userid, self.id, amount)
 
 		if not code == 0:
 			print(f"{userid} tried exchanging {amount} {recvcurr.symbol} to {sendcurr.symbol} with code {code}")
-			return EXCHANGE_RESPONSES.TRANSACTION_FAILED_ON_USERS_END, 0
+			return EXCHANGE_TRANSACTION_MAP[code], 0
 
 		code = sendcurr.createTransaction(self.id, userid, exchanged)
 

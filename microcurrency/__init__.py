@@ -121,8 +121,9 @@ async def _exchange(interaction: discord.Interaction, currency1: app_commands.Ch
 	responses = [
 		f"Succesfully exchanged `{exchangedamt} {currencyB.symbol}` for `{amount} {currencyA.symbol}`",
 		f"You cannot exchange `{currencyA.name}` for `{currencyB.name}`!",
-		f"You cannot make this transaction, check your balance if you have sufficient funds!",
-		f"The bot has insufficient funds, contact an administrator immediatley!"
+		f"The bot has insufficient funds, contact an administrator immediatley!",
+		f"The amount you are trying to exchange is negative or zero!",
+		f"You have insufficient funds!"
 	]
 	color = [0x00ff00, 0xff0000][status>0] # another ugly hack
 	title = ["Transaction Succesful", "Transaction Failed"][status>0]
