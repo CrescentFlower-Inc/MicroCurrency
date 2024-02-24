@@ -139,23 +139,29 @@ async def exchange_rates(interaction: discord.Interaction, currency1: app_comman
 
 	currencyA = currencies[currency1.value]
 	currencyB = currencies[currency2.value]
-	stcurrency = currencies[0]
+	# stcurrency = currencies[0]
 
-	# Stage 1, convert currencyA into standard currency
+	# # Stage 1, convert currencyA into standard currency
 
-	standardRate, _ = exchange.getExchangeRates(currencyA)
+	# standardRate, _ = exchange.getExchangeRates(currencyA)
 
-	if currencyB == stcurrency: # in case we want 1 CurrencyA = x MCS
-		embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {standardRate} {currencyB.symbol}", color=0x00ff00)
-		await interaction.response.send_message(embeds=[embed])
-		return
+	# if currencyB == stcurrency: # in case we want 1 CurrencyA = x MCS
+	# 	embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {standardRate} {currencyB.symbol}", color=0x00ff00)
+	# 	await interaction.response.send_message(embeds=[embed])
+	# 	return
 
-	# Stage 2, convert x MCS into y CurrencyB
+	# # Stage 2, convert x MCS into y CurrencyB
 
-	_, otherRate = exchange.getExchangeRates(currencyB)
-	combinedRate = standardRate * otherRate
+	# _, otherRate = exchange.getExchangeRates(currencyB)
+	# combinedRate = standardRate * otherRate
 
-	embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {combinedRate} {currencyB.symbol}", color=0x00ff00)
+	# embed = discord.Embed(title="Exchange rates", description=f"1 {currencyA.symbol} = {combinedRate} {currencyB.symbol}", color=0x00ff00)
+
+	rate_BA, rate_AB = exchange.getExchangeRates(currencyA, currencyB)
+	embed = discord.Embed(title="Exchange Rates", description=f"Here are the buy and sell rates of `{currencyA.name}` and `{currencyB.name}`", color=0x00ff00)
+	embed.add_field(name="Buy rate", value=f"1 {currencyA.symbol} = {rate_BA} {currencyB.symbol}", inline=True)
+	embed.add_field(name="Sell rate", value=f"{rate_AB} {currencyA.symbol} = 1 {currencyB.symbol}", inline=True)
+
 	await interaction.response.send_message(embeds=[embed])
 
 

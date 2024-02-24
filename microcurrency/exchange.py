@@ -7,12 +7,12 @@ class Exchange:
 		self.standard = standard # Currency standard
 		self.id = id # ID of bot
 
-	def getExchangeRates(self, other): # returns buy and sell prices: (? standard = 1 other, 1 standard = ? other)
-		standardVol = self.standard.getBalance(self.id)
-		otherVol = other.getBalance(self.id)
+	def getExchangeRates(self, currencyA, currencyB): # returns buy and sell prices: (? currencyA = 1 currencyB, 1 currencyA = ? currencyB)
+		CurrencyAVol = currencyA.getBalance(self.id)
+		CurrencyBVol = currencyB.getBalance(self.id)
 
 		try:
-			return (standardVol/otherVol, otherVol/standardVol,)
+			return (CurrencyAVol/CurrencyBVol, CurrencyBVol/CurrencyAVol,)
 		except ZeroDivisionError:
 			return (0, 0,)
 
