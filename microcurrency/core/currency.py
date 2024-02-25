@@ -27,5 +27,3 @@ class Currency:
 
 	def createTransaction(self, sender, receiver, amount):
 		return self.db.createTransaction(self.id, sender, receiver, amount)
-
-

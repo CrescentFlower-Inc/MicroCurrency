@@ -1,8 +1,4 @@
 # Import modules
-from microcurrency.currency import Currency
-from microcurrency.db import Database
-from microcurrency.exchange import Exchange
-
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
@@ -18,30 +14,24 @@ CONFIG = PATH / "config.json"
 with open(str(CONFIG)) as f:
 	config = json.loads(f.read())
 
-db = Database(DB)
-exchange = Exchange(0, Currency(0, config["currencies"][0], db))
-
-# Initialize discord.py values
-
-currencies = []
-for index, rawdata in enumerate(config["currencies"]):
-	currencies.append(Currency(index, rawdata, db))
-
-curchoices = []
-for index, currency in enumerate(config["currencies"]):
-	curchoices.append(app_commands.Choice(name=currency["name"], value=index))
-
 # Main code
 
 bot = commands.Bot(command_prefix="cur!", intents = discord.Intents.default())
 
+async def load_packages():
+	PACKAGES = ["account", "exchange", "apic"]
+	for package in PACKAGES:
+		await bot.load_extension(f"microcurrency.packages.{package}")
+		print(f"Loaded '{package}'")
+
 @bot.event
 async def on_ready():
 	print("MicroCurrency [In-Development], version dev-b14")
+
+	await load_packages()
+
 	await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
 	await bot.tree.sync()
-
-	exchange.id = bot.user.id
 
 	print("Ready!")
 
@@ -60,84 +50,6 @@ async def embtest(interaction: discord.Interaction):
  embed.set_footer(text="Violating any of the rules might result to your bank account reset or terminated.")
  await interaction.response.send_message(embed=embed)
 
-@app_commands.describe(currency = "In what currency would you like to view?", user = "Who's balance would you like to view?")
-@app_commands.choices(currency = curchoices)
-@bot.tree.command(name="balance", description="Gets the balance of your or somebody else's account")
-async def balance(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member=None):
-	if user == None: user = interaction.user
-	currency = currencies[currency.value]
-	balance = currency.getBalance(int(user.id))
-
-	embed = discord.Embed(description=f"{balance} {currency.symbol}", color=0x00ff00)
-	embed.set_author(name=user.display_name, icon_url=user.display_avatar.url.split("?")[0])
-	await interaction.response.send_message(embeds=[embed])
-
-@app_commands.describe(currency = "What currency", user = "The target user")
-@app_commands.choices(currency = curchoices)
-@bot.tree.command(name="transfer", description="Transfer money to another person")
-async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
-	currency = currencies[currency.value]
-	status = currency.createTransaction(interaction.user.id, user.id, amount)
-
-	responses = [
-		f"Succesfully transfered {amount} {currency.symbol} to {user.display_name}",
-		"You cannot send no or negative money!",
-		"You cannot send money to yourself!",
-		"You have insufficient funds!"
-	]
-
-	color = [0x00ff00, 0xff0000][status>0] # if status>0 is true, index "1" gets set into color (aka the red hex code), if it's false then index "0" gets set into color (aka green hex code)
-	title = [":white_check_mark: Transaction completed", ":x: Transaction failed"][status>0] # same thing with color
-
-	embed = discord.Embed(title=title, color=color, description=responses[status])
-	await interaction.response.send_message(embeds=[embed])
-
-
-@app_commands.describe(currency1 = "What currency you want to see the value of", currency2 = "The currency in which the value is portrayed")
-@app_commands.choices(currency1 = curchoices, currency2 = curchoices)
-@bot.tree.command(name="exchangerates", description="Get the exchange rates of two currencies")
-async def exchange_rates(interaction: discord.Interaction, currency1: app_commands.Choice[int], currency2: app_commands.Choice[int]):
-
-	currencyA = currencies[currency1.value]
-	currencyB = currencies[currency2.value]
-
-	rate_AB, rate_BA = exchange.getExchangeRates(currencyA, currencyB)
-	embed = discord.Embed(title="Exchange Rates", description=f"Here are the buy and sell rates of `{currencyA.name}` and `{currencyB.name}`", color=0x00ff00)
-	embed.add_field(name="Buy rate", value=f"1 {currencyA.symbol} = {rate_BA} {currencyB.symbol}", inline=True)
-	embed.add_field(name="Sell rate", value=f"{rate_AB} {currencyA.symbol} = 1 {currencyB.symbol}", inline=True)
-
-	await interaction.response.send_message(embeds=[embed])
-
-@app_commands.describe(currency1 = "The currency you want to exchange", currency2 = "The currency that you want to receive", amount = "The amount of currency1 you want to exchange")
-@app_commands.choices(currency1 = curchoices, currency2 = curchoices)
-@bot.tree.command(name="exchange", description="Exchange two currencies")
-async def _exchange(interaction: discord.Interaction, currency1: app_commands.Choice[int], currency2: app_commands.Choice[int], amount: int):
-	currencyA = currencies[currency1.value]
-	currencyB = currencies[currency2.value]
-
-	_, rate_BA = exchange.getExchangeRates(currencyA, currencyB)
-	status, exchangedamt = exchange.exchange(interaction.user.id, rate_BA, amount, currencyB, currencyA)
-
-	responses = [
-		f"Succesfully exchanged `{exchangedamt} {currencyB.symbol}` for `{amount} {currencyA.symbol}`",
-		f"You cannot exchange `{currencyA.name}` for `{currencyB.name}`!",
-		f"The bot has insufficient funds, contact an administrator immediatley!",
-		f"The amount you are trying to exchange is negative or zero!",
-		f"You have insufficient funds!"
-	]
-	color = [0x00ff00, 0xff0000][status>0] # another ugly hack
-	title = ["Transaction Succesful", "Transaction Failed"][status>0]
-
-	embed = discord.Embed(title=title, description=responses[status], color=color)
-	await interaction.response.send_message(embeds=[embed])
-
-
-
-@bot.tree.command(name="create_token", description="Creates or regenerates an API token for you.")
-async def create_token(interaction: discord.Interaction):
-	tok = db.createAPIToken(interaction.user.id)
-
-	await interaction.response.send_message(f"Your new API token is: `{tok}`\nFor security purposes, API token can only be shown **once**.\nIf you lose it, you will have to regenerate it with the same command.", ephemeral=True)
 
 ####### uvicorn stuff
 

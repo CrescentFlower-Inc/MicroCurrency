@@ -1,7 +1,7 @@
 {
 	"currencies": [
 		{
-			"name": "Micronational Currency Standard", // The first currency is always the standard, also remove this comment when configuring!!!
+			"name": "Micronational Currency Standard",
 			"symbol": "μ",
 			"managers": []
 		},
