@@ -1,12 +1,13 @@
 from microcurrency.core.db import Database
+from microcurrency.core.currency import Currency
 from fastapi import FastAPI, Request
 from pathlib import Path
 import json
 
-db_path = str(  Path(__file__).parents[1] / "DATABASE.db"  )
+db_path = str(  Path(__file__).parents[2] / "DATABASE.db"  )
 db = Database(db_path)
 
-with open(Path(__file__).parents[1] / "config.json") as f:
+with open(Path(__file__).parents[2] / "config.json") as f:
 	config = json.loads(f.read())
 
 app = FastAPI()

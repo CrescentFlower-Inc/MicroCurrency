@@ -32,6 +32,8 @@ async def reload_packages():
 		await bot.reload_extension(f"microcurrency.packages.{package}")
 		print(f"Reloaded '{package}'")
 
+	await bot.tree.sync()
+
 @bot.event
 async def on_ready():
 	print("MicroCurrency [In-Development], version dev-b14")
@@ -107,7 +109,5 @@ def start():
 	if config["api"]["enabled"]:
 		with server.run_in_thread():
 			bot.run(config["token"])
-		# threading.Thread(daemon=True, target=bot.run, args=(config["token"],)).start()
-		# uvicorn.run("microcurrency.api:app", host=config["api"]["host"], port=config["api"]["port"], reload=config["api"]["reload"])
 	else:
 		bot.run(config["token"])
