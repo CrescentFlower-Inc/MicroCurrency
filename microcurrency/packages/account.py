@@ -1,5 +1,6 @@
 from microcurrency.core.currency import Currency
 from microcurrency.core.db import Database
+from microcurrency.util import mround
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
@@ -38,7 +39,7 @@ class Account(commands.Cog):
 			currency = currencies[currency.value]
 			balance = currency.getBalance(int(user.id))
 
-			embed = discord.Embed(description=f"{balance} {currency.symbol}", color=0x00ff00)
+			embed = discord.Embed(description=f"{mround(balance)} {currency.symbol}", color=0x00ff00)
 			embed.set_author(name=user.display_name, icon_url=user.display_avatar.url.split("?")[0])
 			await interaction.response.send_message(embeds=[embed])
 
@@ -50,7 +51,7 @@ class Account(commands.Cog):
 			status = currency.createTransaction(interaction.user.id, user.id, amount)
 
 			responses = [
-				f"Succesfully transfered {amount} {currency.symbol} to {user.display_name}",
+				f"Succesfully transfered {mround(amount)} {currency.symbol} to {user.display_name}",
 				"You cannot send no or negative money!",
 				"You cannot send money to yourself!",
 				"You have insufficient funds!"

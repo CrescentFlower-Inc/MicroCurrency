@@ -1,5 +1,6 @@
 from microcurrency.core.currency import Currency
 from microcurrency.core.db import Database
+from microcurrency.util import mround
 from microcurrency.enum import *
 from discord import app_commands
 from discord.ext import commands
@@ -80,8 +81,8 @@ class Exchange(commands.Cog):
 
 			rate_AB, rate_BA = getExchangeRates(bot.user.id, currencyA, currencyB)
 			embed = discord.Embed(title="Exchange Rates", description=f"Here are the buy and sell rates of `{currencyA.name}` and `{currencyB.name}`", color=0x00ff00)
-			embed.add_field(name="Buy rate", value=f"1 {currencyA.symbol} = {rate_BA} {currencyB.symbol}", inline=True)
-			embed.add_field(name="Sell rate", value=f"{rate_AB} {currencyA.symbol} = 1 {currencyB.symbol}", inline=True)
+			embed.add_field(name="Buy rate", value=f"1.00 {currencyA.symbol} = {mround(rate_BA)} {currencyB.symbol}", inline=True)
+			embed.add_field(name="Sell rate", value=f"{mround(rate_AB)} {currencyA.symbol} = 1.00 {currencyB.symbol}", inline=True)
 
 			await interaction.response.send_message(embeds=[embed])
 
@@ -96,7 +97,7 @@ class Exchange(commands.Cog):
 			status, exchangedamt = createExchangeTransaction(bot.user.id, interaction.user.id, rate_BA, amount, currencyB, currencyA)
 
 			responses = [
-				f"Succesfully exchanged `{exchangedamt} {currencyB.symbol}` for `{amount} {currencyA.symbol}`",
+				f"Succesfully exchanged `{mround(exchangedamt)} {currencyB.symbol}` for `{mround(amount)} {currencyA.symbol}`",
 				f"You cannot exchange `{currencyA.name}` for `{currencyB.name}`!",
 				f"The bot has insufficient funds, contact an administrator immediatley!",
 				f"The amount you are trying to exchange is negative or zero!",
