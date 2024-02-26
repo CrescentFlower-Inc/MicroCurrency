@@ -57,6 +57,8 @@ async def embtest(interaction: discord.Interaction):
 	embed.set_footer(text="Violating any of the rules might result to your bank account reset or terminated.")
 	await interaction.response.send_message(embed=embed)
 
+@app_commands.checks.has_any_role(config["admin_role"])
+@app_commands.guilds(discord.Object(config['dev_server_id']))
 @bot.tree.command(name="reload_packages", description="Reloads all packages")
 async def reload_command(interaction: discord.Interaction):
 	try:
@@ -70,6 +72,12 @@ async def reload_command(interaction: discord.Interaction):
 		embed.add_field(name="Error", value=f"{type(e)}: {e}")
 		await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
+@reload_command.error
+async def reload_command_error(interaction: discord.Interaction, error):
+	print(f"Unauthorized attempt at using /reload_packages by {interaction.user.display_name} or {interaction.user.id}!")
+	embed = discord.Embed(title="Access denied", description="You are not authorized to use this command!", color=0xff0000)
+	# print(error)
+	await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
 ####### uvicorn stuff
 
