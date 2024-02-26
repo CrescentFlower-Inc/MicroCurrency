@@ -104,7 +104,7 @@ class Exchange(commands.Cog):
 				f"You have insufficient funds!"
 			]
 			color = [0x00ff00, 0xff0000][status>0] # another ugly hack
-			title = ["Transaction Succesful", "Transaction Failed"][status>0]
+			title = [":white_check_mark: Transaction succesful", ":x: Transaction failed"][status>0]
 
 			embed = discord.Embed(title=title, description=responses[status], color=color)
 			await interaction.response.send_message(embeds=[embed])
