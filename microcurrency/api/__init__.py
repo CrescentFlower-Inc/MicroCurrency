@@ -1,14 +1,22 @@
 from microcurrency.core.db import Database
 from microcurrency.core.currency import Currency
+from microcurrency.util import mround
 from fastapi import FastAPI, Request
 from pathlib import Path
 import json
 
-db_path = str(  Path(__file__).parents[2] / "DATABASE.db"  )
-db = Database(db_path)
+PATH = Path(__file__).parents[2]
+DB = PATH / "DATABASE.db"
+CONFIG = PATH / "config.json"
 
-with open(Path(__file__).parents[2] / "config.json") as f:
+db = Database(DB)
+
+with open(str(CONFIG)) as f:
 	config = json.loads(f.read())
+
+currencies = []
+for index, rawdata in enumerate(config["currencies"]):
+	currencies.append(Currency(index, rawdata, db))
 
 app = FastAPI()
 
@@ -18,7 +26,7 @@ async def balance(request: Request):
 	body = await request.json()
 
 	try:
-		return {"success": True, "balance": db.getBalance(body["currency"], body["user"])}
+		return {"success": True, "balance": mround(db.getBalance(body["currency"], body["user"]))}
 	except json.decoder.JSONDecodeError:
 		return {"success": False, "error": "No JSON provided!"}
 	except KeyError as e:
@@ -34,7 +42,8 @@ async def transaction(request: Request):
 		return {"success": False, "error": "Authentication failed!"}
 
 	try:
-		resp = db.createTransaction(int(body["currency"]), int(userid), int(body["receiver"]), float(body["amount"]))
+		curr = currencies[int(body["currency"])]
+		resp = curr.createTransaction(int(userid), int(body["receiver"]), float(body["amount"]))
 		if resp == 0:
 			return {"success": True}
 
