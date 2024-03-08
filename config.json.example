@@ -16,8 +16,12 @@
 			"managers": []
 		}
 	],
+    "dev_server": {
+        "role": 1202348639406530621,
+        "server": 1138412428036685864
+    },
 	"api": {
-		"enabled": true,
+		"enabled": false,
 		"host": "0.0.0.0",
 		"port": 8000,
 		"reload": false

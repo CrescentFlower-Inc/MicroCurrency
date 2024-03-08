@@ -59,8 +59,8 @@ async def embtest(interaction: discord.Interaction):
 	embed.set_footer(text="Violating any of the rules might result to your bank account reset or terminated.")
 	await interaction.response.send_message(embed=embed)
 
-@app_commands.checks.has_any_role(config["admin_role"])
-@app_commands.guilds(discord.Object(config['dev_server_id']))
+@app_commands.checks.has_any_role(config["dev_server"]["role"])
+@app_commands.guilds(discord.Object(config["dev_server"]["server"]))
 @bot.tree.command(name="reload_packages", description="Reloads all packages")
 async def reload_command(interaction: discord.Interaction):
 	try:
@@ -69,7 +69,7 @@ async def reload_command(interaction: discord.Interaction):
 		await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
 	except Exception as e:
-		errtype = str()
+		errtype = str(e)
 		embed = discord.Embed(title="Reload failed", description="A package failed to reload!", color=0xff0000)
 		embed.add_field(name="Error", value=f"{type(e)}: {e}")
 		await interaction.response.send_message(embeds=[embed], ephemeral=True)
