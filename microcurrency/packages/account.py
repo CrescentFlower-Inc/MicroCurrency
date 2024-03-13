@@ -1,6 +1,6 @@
 from microcurrency.core.currency import Currency
 from microcurrency.core.db import Database
-from microcurrency.util import mround
+from microcurrency.util import mround, TestPager
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
@@ -43,7 +43,7 @@ class Account(commands.Cog):
 			embed.set_author(name=user.display_name, icon_url=user.display_avatar.url.split("?")[0])
 			await interaction.response.send_message(embeds=[embed])
 
-		@app_commands.describe(currency = "What currency", user = "The target user")
+		@app_commands.describe(currency = "In what currency?", user = "Who will receive the money?")
 		@app_commands.choices(currency = curchoices)
 		@self.bot.tree.command(name="transfer", description="Transfer money to another person")
 		async def transfer(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, user: discord.Member): # gonna refactor this later
@@ -62,6 +62,15 @@ class Account(commands.Cog):
 
 			embed = discord.Embed(title=title, color=color, description=responses[status])
 			await interaction.response.send_message(embeds=[embed])
+
+		@app_commands.describe(currency = "In what currency?", user = "Who do you want to inspect the transaction history of?")
+		@app_commands.choices(currency = curchoices)
+		@self.bot.tree.command(name="history", description="View transaction histories")
+		async def history(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member=None):
+			if user == None: user = interaction.user
+			pager = TestPager(interaction.user.id)
+			await interaction.response.send_message(embeds=[pager.getEmbed()], view=pager)
+			# await interaction.response.send_message("This command is under construction duck!!")
 
 async def setup(bot):
 	await bot.add_cog(Account(bot))
