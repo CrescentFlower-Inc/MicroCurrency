@@ -1,10 +1,35 @@
 from microcurrency.core.currency import Currency
 from microcurrency.core.db import Database
-from microcurrency.util import mround, TestPager
+from microcurrency.util import mround, GeneralPager
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
-import discord, json
+import discord, json, math
+
+class TransactionHistoryPager(GeneralPager):
+	def __init__(self, transactions, symbol, owner, timeout=180):
+		print(timeout)
+		super().__init__(transactions, owner, timeout=timeout)
+
+		self.title = "Transaction History" 
+		self.description = "Here you will see your transaction history"
+		self.transaction_count = sum(1 for _ in transactions)
+		self.pages = math.ceil(self.transaction_count/self.getAmountInPage())
+
+	def getPage(self):
+		startIndex = self.page*self.getAmountInPage()
+		endIndex = (self.page+1)*self.getAmountInPage()
+		if endIndex > self.transaction_count-1:
+			endIndex = self.transaction_count-1
+
+		fields = [] 
+		for index, transaction in enumerate(self.data[startIndex:endIndex]):
+			fields.append({"name": f"Transaction {index}", "value": f"[ID: {transaction.id}] {transaction.sender}->{transaction.receiver} ({symbol} {transaction.amount})"})
+
+		return field
+
+	def getAmountInPage(self):
+		return 10
 
 class Account(commands.Cog):
 	def __init__(self, bot):
@@ -68,7 +93,9 @@ class Account(commands.Cog):
 		@self.bot.tree.command(name="history", description="View transaction histories")
 		async def history(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member=None):
 			if user == None: user = interaction.user
-			pager = TestPager(interaction.user.id)
+			currency = currencies[currency.value]
+			transactions = currency.getTransactionsOfUser(interaction.user.id)
+			pager = TransactionHistoryPager(transactions, currency.symbol, interaction.user.id)
 			await interaction.response.send_message(embeds=[pager.getEmbed()], view=pager)
 			# await interaction.response.send_message("This command is under construction duck!!")
 

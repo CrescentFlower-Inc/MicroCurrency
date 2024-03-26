@@ -25,5 +25,10 @@ class Currency:
 
 		return True, Transaction(rawt[0], self, rawt[2], rawt[3], rat[4])
 
+	def getTransactions(self):
+		return self.db.getTransactions(self.id)
+	def getTransactionsOfUser(self, user):
+		return self.db.getTransactionsOfUser(user, self.id)
+
 	def createTransaction(self, sender, receiver, amount):
 		return self.db.createTransaction(self.id, sender, receiver, amount)

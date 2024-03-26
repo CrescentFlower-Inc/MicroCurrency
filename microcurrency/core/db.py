@@ -40,8 +40,17 @@ class Database:
 
 		return True, res[0]
 
-	def getTransactions(self):
-		return (x for x in self.curr.execute("SELECT * FROM transactions").fetchall())
+	def getTransactions(self, currency=None):
+		if currency == None:
+			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions").fetchall())
+		else:
+			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions WHERE cid=?", (currency)).fetchall())
+
+	def getTransactionsOfUser(self, user, currency=None):
+		if currency == None:
+			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions WHERE (sid=? OR rid=?)", (user,user,)).fetchall())
+		else:
+			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions WHERE cid=? AND (sid=? OR rid=?)", (currency, user, user)).fetchall())		
 
 	def getBalance(self, cid, id):
 		res = self.curr.execute("SELECT sid, rid, amt FROM transactions WHERE cid=? AND (sid=? OR rid=?);", (cid, id, id,)).fetchall()
