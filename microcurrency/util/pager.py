@@ -50,10 +50,15 @@ class GeneralPager(discord.ui.View):
 
 
     def getEmbed(self):
+        # TODO: This might do for now. In the future though, find a way to get rid of this if else
         embed = discord.Embed(title=self.title, description=self.description, color=0x00ff00)
-        embed.set_footer(text=f"Page {self.page+1}/{self.pages} Showing {self.page*self.getAmountInPage()+1}-{(self.page+1)*self.getAmountInPage()}")
-        for field in self.getPage():
-            embed.add_field(name=field["name"], value=field["value"], inline=field["inline"])
+        if self.pages == 0:
+            embed.add_field(name="No data", value="*There is no data*")
+            embed.set_footer(text=f"Page 0/0 No data")
+        else:
+            embed.set_footer(text=f"Page {self.page+1}/{self.pages} Showing {self.page*self.getAmountInPage()+1}-{(self.page+1)*self.getAmountInPage()}")
+            for field in self.getPage():
+                embed.add_field(name=field["name"], value=field["value"], inline=field["inline"])
 
         return embed
 

@@ -1,4 +1,4 @@
-from microcurrency.core.currency import Currency
+from microcurrency.core.currency import Currency, Transaction
 from microcurrency.core.db import Database
 from microcurrency.util import mround, GeneralPager
 from discord import app_commands
@@ -7,26 +7,29 @@ from pathlib import Path
 import discord, json, math
 
 class TransactionHistoryPager(GeneralPager):
-	def __init__(self, transactions, symbol, owner, timeout=180):
-		print(timeout)
+	def __init__(self, _transactions, symbol, owner, timeout=180):
+
+		# TODO: This is bad code and must be exterminated
+		transactions = [t for t in _transactions]
+
 		super().__init__(transactions, owner, timeout=timeout)
 
 		self.title = "Transaction History" 
-		self.description = "Here you will see your transaction history"
+		self.description = "Here you will see your transaction history\nNote: the transaction history displays discord ID's"
 		self.transaction_count = sum(1 for _ in transactions)
 		self.pages = math.ceil(self.transaction_count/self.getAmountInPage())
+		self.symbol = symbol
 
 	def getPage(self):
 		startIndex = self.page*self.getAmountInPage()
 		endIndex = (self.page+1)*self.getAmountInPage()
-		if endIndex > self.transaction_count-1:
-			endIndex = self.transaction_count-1
+		if endIndex > self.transaction_count:
+			endIndex = self.transaction_count
 
 		fields = [] 
 		for index, transaction in enumerate(self.data[startIndex:endIndex]):
-			fields.append({"name": f"Transaction {index}", "value": f"[ID: {transaction.id}] {transaction.sender}->{transaction.receiver} ({symbol} {transaction.amount})"})
-
-		return field
+			fields.append({"name": f"Transaction {index}", "value": f"[ID: {transaction.id}] {transaction.sender} -> {transaction.receiver} ({self.symbol} {transaction.amount})", "inline": (index%self.getAmountInPage() > self.getAmountInPage()/2)})
+		return fields
 
 	def getAmountInPage(self):
 		return 10
@@ -36,7 +39,7 @@ class Account(commands.Cog):
 		self.bot = bot
 		self._last_member = None
 
-		############################   TODO: Make it so that this doesn't have to be copy pasted inside every god damn package
+		############################   TODO: Make it so that this doesn't have to be copy pasted inside every damn package
 		PATH = Path(__file__).parents[2]
 		DB = PATH / "DATABASE.db"
 		CONFIG = PATH / "config.json"
