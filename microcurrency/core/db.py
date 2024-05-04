@@ -1,5 +1,6 @@
 # I def gotta switch to an ORM later
 from microcurrency.enum import *
+from microcurrency.core.currency import Transaction, Currency
 from hashlib import sha512
 import sqlite3 as sl
 import random
@@ -15,7 +16,7 @@ class Database:
 
 	def createAPIToken(self, user):
 		CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()"
-		token = "".join([random.choice(CHARSET) for x in range(32)])
+		token = "".join([random.choice(CHARSET) for t in range(32)])
 		hashed = sha512(token.encode('utf-8')).hexdigest()
 
 		# print(self.curr.execute("SELECT userid FROM apitokens WHERE userid=?", (user,)).fetchone())
@@ -42,15 +43,15 @@ class Database:
 
 	def getTransactions(self, currency=None):
 		if currency == None:
-			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions").fetchall())
+			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions").fetchall())
 		else:
-			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions WHERE cid=?", (currency)).fetchall())
+			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE cid=?", (currency)).fetchall())
 
 	def getTransactionsOfUser(self, user, currency=None):
 		if currency == None:
-			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions WHERE (sid=? OR rid=?)", (user,user,)).fetchall())
+			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE (sid=? OR rid=?)", (user,user,)).fetchall())
 		else:
-			return (Transaction(x[0], x[1], x[2], x[3], x[4]) for x in self.curr.execute("SELECT * FROM transactions WHERE cid=? AND (sid=? OR rid=?)", (currency, user, user)).fetchall())		
+			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE cid=? AND (sid=? OR rid=?)", (currency, user, user)).fetchall())		
 
 	def getBalance(self, cid, id):
 		res = self.curr.execute("SELECT sid, rid, amt FROM transactions WHERE cid=? AND (sid=? OR rid=?);", (cid, id, id,)).fetchall()
