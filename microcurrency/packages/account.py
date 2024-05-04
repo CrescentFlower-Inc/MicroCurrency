@@ -28,7 +28,8 @@ class TransactionHistoryPager(GeneralPager):
 
 		fields = [] 
 		for index, transaction in enumerate(self.data[startIndex:endIndex]):
-			print(index, index%self.getAmountInPage(), index%self.getAmountInPage()%3)
+			# print(index, index%self.getAmountInPage(), index%self.getAmountInPage()%3)
+			# TODO: (optional) Make it so that fields are in two columns
 			fields.append({"name": f"Transaction {index}", "value": f"[ID: {transaction.id}] {transaction.sender} -> {transaction.receiver} ({self.symbol} {transaction.amount})", "inline": False})
 		return fields
 
