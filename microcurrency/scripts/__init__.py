@@ -1,4 +1,4 @@
-from microcurrency.db import Database
+from microcurrency.core.db import Database
 from pathlib import Path
 import json
 
