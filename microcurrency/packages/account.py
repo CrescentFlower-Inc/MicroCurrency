@@ -28,7 +28,8 @@ class TransactionHistoryPager(GeneralPager):
 
 		fields = [] 
 		for index, transaction in enumerate(self.data[startIndex:endIndex]):
-			fields.append({"name": f"Transaction {index}", "value": f"[ID: {transaction.id}] {transaction.sender} -> {transaction.receiver} ({self.symbol} {transaction.amount})", "inline": (index%self.getAmountInPage() > self.getAmountInPage()/2)})
+			print(index, index%self.getAmountInPage(), index%self.getAmountInPage()%3)
+			fields.append({"name": f"Transaction {index}", "value": f"[ID: {transaction.id}] {transaction.sender} -> {transaction.receiver} ({self.symbol} {transaction.amount})", "inline": False})
 		return fields
 
 	def getAmountInPage(self):
