@@ -48,10 +48,14 @@ class Database:
 			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE cid=?", (currency)).fetchall())
 
 	def getTransactionsOfUser(self, user, currency=None):
-		if currency == None:
-			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE (sid=? OR rid=?)", (user,user,)).fetchall())
-		else:
-			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE cid=? AND (sid=? OR rid=?)", (currency, user, user)).fetchall())		
+		# # rawhist = self.curr.execute("SELECT * FROM ")
+		# if currency == None:
+		# 	rawhist = 
+		# 	# return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE (sid=? OR rid=?)", (user,user,)).fetchall())
+		# else:
+		# 	# return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE cid=? AND (sid=? OR rid=?)", (currency, user, user)).fetchall())		
+		rawhist = self.curr.execute("SELECT * FROM transactions WHERE (sid=? OR rid=?)", (user,user,)).fetchall() if currency == None else  self.curr.execute("SELECT * FROM transactions WHERE cid=? AND (sid=? OR rid=?)", (currency,user,user,)).fetchall()
+		return len(rawhist), (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in rawhist)
 
 	def getBalance(self, cid, id):
 		res = self.curr.execute("SELECT sid, rid, amt FROM transactions WHERE cid=? AND (sid=? OR rid=?);", (cid, id, id,)).fetchall()

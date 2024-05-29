@@ -7,7 +7,7 @@ from pathlib import Path
 import discord, json, math
 
 class TransactionHistoryPager(GeneralPager):
-	def __init__(self, _transactions, symbol, owner, timeout=180):
+	def __init__(self, transactions_len, _transactions, symbol, owner, timeout=180):
 
 		# TODO: This is bad code and must be exterminated
 		transactions = [t for t in _transactions]
@@ -16,7 +16,7 @@ class TransactionHistoryPager(GeneralPager):
 
 		self.title = "Transaction History" 
 		self.description = "Here you will see your transaction history\nNote: the transaction history displays discord ID's"
-		self.transaction_count = sum(1 for _ in transactions)
+		self.transaction_count = transactions_len
 		self.pages = math.ceil(self.transaction_count/self.getAmountInPage())
 		self.symbol = symbol
 
@@ -99,8 +99,8 @@ class Account(commands.Cog):
 		async def history(interaction: discord.Interaction, currency: app_commands.Choice[int], user: discord.Member=None):
 			if user == None: user = interaction.user
 			currency = currencies[currency.value]
-			transactions = currency.getTransactionsOfUser(interaction.user.id)
-			pager = TransactionHistoryPager(transactions, currency.symbol, interaction.user.id)
+			transactions_len, transactions = currency.getTransactionsOfUser(interaction.user.id)
+			pager = TransactionHistoryPager(transactions_len, transactions, currency.symbol, interaction.user.id)
 			await interaction.response.send_message(embeds=[pager.getEmbed()], view=pager)
 			# await interaction.response.send_message("This command is under construction duck!!")
 
