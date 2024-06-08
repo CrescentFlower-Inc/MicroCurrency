@@ -1,4 +1,5 @@
 from microcurrency.api.account import app as accountApp
+from microcurrency.api.exchange import app as exchangeApp
 from microcurrency.core.currency import Currency
 from microcurrency.core.db import Database
 from fastapi import FastAPI, Request
@@ -19,6 +20,7 @@ for index, rawdata in enumerate(config["currencies"]):
 	currencies.append(Currency(index, rawdata, db))
 
 app = FastAPI()
+app.mount("/api/exchange", exchangeApp)
 app.mount("/api/account", accountApp)
 
 @app.get("/api/list_currencies")

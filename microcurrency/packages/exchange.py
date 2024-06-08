@@ -9,9 +9,9 @@ import discord, json
 
 # TODO: Refactor these functions to be better
 
-def getExchangeRates(botid, currencyA, currencyB): # returns buy and sell prices: (? currencyA = 1 currencyB, 1 currencyA = ? currencyB)
-	CurrencyAVol = currencyA.getBalance(botid)
-	CurrencyBVol = currencyB.getBalance(botid)
+def getExchangeRates(currencyA, currencyB): # returns buy and sell prices: (? currencyA = 1 currencyB, 1 currencyA = ? currencyB)
+	CurrencyAVol = currencyA.getBalance(1)
+	CurrencyBVol = currencyB.getBalance(1)
 
 	try:
 		return (CurrencyAVol/CurrencyBVol, CurrencyBVol/CurrencyAVol,)
@@ -19,7 +19,7 @@ def getExchangeRates(botid, currencyA, currencyB): # returns buy and sell prices
 		return (0, 0,)
 
 
-def createExchangeTransaction(botid, userid, rate, amount, sendcurr, recvcurr):
+def createExchangeTransaction(userid, rate, amount, sendcurr, recvcurr):
 	'''
 	More codes!!!
 		0 - Succesful exchange
@@ -31,16 +31,16 @@ def createExchangeTransaction(botid, userid, rate, amount, sendcurr, recvcurr):
 		return EXCHANGE_RESPONSES.CURRENCYA_IS_CURRENCYB, 0
 
 	exchanged = rate*amount
-	code = recvcurr.createTransaction(userid, botid, amount)
+	code = recvcurr.createTransaction(userid, 1, amount)
 
 	if not code == 0:
 		print(f"{userid} tried exchanging {amount} {recvcurr.symbol} to {sendcurr.symbol} with code {code}")
 		return EXCHANGE_TRANSACTION_MAP[code], 0
 
-	code = sendcurr.createTransaction(botid, userid, exchanged)
+	code = sendcurr.createTransaction(1, userid, exchanged)
 
 	if not code == 0:
-		recvcurr.createTransaction(botid, userid, amount) # refund
+		recvcurr.createTransaction(1, userid, amount) # refund
 		return EXCHANGE_RESPONSES.TRANSACTION_FAILED_ON_BOTS_END, 0
 
 	return EXCHANGE_RESPONSES.SUCCESS, exchanged
@@ -79,7 +79,7 @@ class Exchange(commands.Cog):
 			currencyA = currencies[currency1.value]
 			currencyB = currencies[currency2.value]
 
-			rate_AB, rate_BA = getExchangeRates(bot.user.id, currencyA, currencyB)
+			rate_AB, rate_BA = getExchangeRates(currencyA, currencyB)
 			embed = discord.Embed(title="Exchange Rates", description=f"Here are the buy and sell rates of `{currencyA.name}` and `{currencyB.name}`", color=0x00ff00)
 			embed.add_field(name="Buy rate", value=f"1.00 {currencyA.symbol} = {mround(rate_BA)} {currencyB.symbol}", inline=True)
 			embed.add_field(name="Sell rate", value=f"{mround(rate_AB)} {currencyA.symbol} = 1.00 {currencyB.symbol}", inline=True)
@@ -93,12 +93,12 @@ class Exchange(commands.Cog):
 			currencyA = currencies[currency1.value]
 			currencyB = currencies[currency2.value]
 
-			_, rate_BA = getExchangeRates(bot.user.id, currencyA, currencyB)
-			status, exchangedamt = createExchangeTransaction(bot.user.id, interaction.user.id, rate_BA, amount, currencyB, currencyA)
+			_, rate_BA = getExchangeRates(currencyA, currencyB)
+			status, exchangedamt = createExchangeTransaction(interaction.user.id, rate_BA, amount, currencyB, currencyA)
 
 			responses = [
-				f"Succesfully exchanged `{mround(exchangedamt)} {currencyB.symbol}` for `{mround(amount)} {currencyA.symbol}`",
-				f"You cannot exchange `{currencyA.name}` for `{currencyB.name}`!",
+				f"Succesfully exchanged `{mround(amount)} {currencyA.symbol} for `{mround(exchangedamt)} {currencyB.symbol}``",
+				f"You cannot exchange `{currencyB.name}` for `{currencyA.name}`!",
 				f"The bot has insufficient funds, contact an administrator immediatley!",
 				f"The amount you are trying to exchange is negative or zero!",
 				f"You have insufficient funds!"

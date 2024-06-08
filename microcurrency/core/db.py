@@ -36,10 +36,10 @@ class Database:
 		return True, dbresp[0]
 
 	def getTransactionByID(self, tid):
-		res = curr.execute("SELECT * FROM transactions WHERE tid=?").fetchall()
+		res = self.curr.execute("SELECT * FROM transactions WHERE tid=?", (tid,)).fetchall()
 		if len(res) == 0: return False, None
 
-		return True, res[0]
+		return True, Transaction(res[0][0], res[0][1], res[0][2], res[0][3], res[0][4])
 
 	def getTransactions(self, currency=None):
 		if currency == None:

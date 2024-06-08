@@ -1,6 +1,5 @@
 from microcurrency.core.db import Database
 from microcurrency.core.currency import Currency
-from microcurrency.util import mround
 from fastapi import FastAPI, Request
 from pathlib import Path
 import json
@@ -28,7 +27,7 @@ async def balance(request: Request):
 	try:
 		body = await request.json()
 
-		return {"success": True, "balance": mround(db.getBalance(body["currency"], body["user"]))}
+		return {"success": True, "balance": db.getBalance(body["currency"], body["user"])}
 	except json.decoder.JSONDecodeError:
 		return {"success": False, "error": "No JSON provided!"}
 	except KeyError as e:
@@ -78,8 +77,29 @@ async def history(request: Request):
 	except KeyError as e:
 		return {"success": False, "error": f"Missing {e} field."}
 
+@app.get("/transaction")
+async def transaction_get(request: Request):
+	try:
+		body = await request.json()
+		ID = int(body["id"])
+
+		status, transaction = db.getTransactionByID(ID)
+		if not status:
+			return {"success": False, "error": "Transaction not found!"}
+
+		return {"success": True, "transaction": {
+			"id": transaction.id,
+			"currency": transaction.currency,
+			"sender": transaction.sender,
+			"receiver": transaction.receiver,
+			"amount": transaction.amount
+		}}
+	except json.decoder.JSONDecodeError:
+		return {"success": False, "error": "No JSON provided!"}
+	except KeyError as e:
+		return {"success": False, "error": f"Missing {e} field."}
 @app.post('/transaction')
-async def transaction(request: Request):
+async def transaction_post(request: Request):
 	auth = request.headers.get("X-Auth-Token")
 
 	status, userid = db.authenticate(auth)
