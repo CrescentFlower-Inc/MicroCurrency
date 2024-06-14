@@ -3,17 +3,14 @@
 		{
 			"name": "Micronational Currency Standard",
 			"symbol": "μ",
-			"managers": []
 		},
 		{
 			"name": "Pur",
 			"symbol": "Ᵽ",
-			"managers": []
 		},
 		{
 			"name": "Spilling",
 			"symbol": "Ł",
-			"managers": []
 		}
 	],
     "dev_server": {

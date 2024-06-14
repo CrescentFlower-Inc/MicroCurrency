@@ -51,12 +51,12 @@ async def exchange(request: Request):
 		body = await request.json()
 		currency1 = currencies[body["currency1"]]
 		currency2 = currencies[body["currency2"]]
-		amount = int(body["amount"])
+		amount = float(body["amount"])
 		_, rate_BA = getExchangeRates(currency1, currency2)
 		status, exchangedamt = createExchangeTransaction(userid, rate_BA, amount, currency2, currency1)
 
 		responses = [
-			"what the sigma",
+			"wtf",
 			f"Invalid currency options",
 			f"Something has gone terribly wrong with the bot!",
 			f"The amount you are trying to exchange is negative or zero!",

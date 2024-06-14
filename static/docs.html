@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>MicroCurrency API Documents</title>
+    </head>
+    <body>
+        <h1>API Documentation</h1>
+        This web page contains the documentation to Microballs' API.
+
+        <h2>Authentication</h2>
+        As of right now, you cannot create a microballs account that is independant of discord (atleast without the assistance of an administrator).<br>
+        All* microballs accounts are tied to a discord account.<br>
+        For authenticating yourself, you will need to use an API token, a random 32-character long string.<br>
+        You can generate this token by running the /create_token command in discord.<br>
+        As of right now, <b>all POST endpoints require authentication, GET endpoints require no authentication.</b><br>
+        To provide an API token in your request, add the X-Auth-Token header like so: <code>X-Auth-Token: W&OT&1IsxyQ$5IxHrisdM2)i*9%I0G!P</code>
+
+        <h2>Response structure</h2>
+        When you make a request, the response will be formatted in JSON.<br>
+        There will <b>always</b> be a "success" field, which is true if your request was succesful, and false if it wasn't.<br>
+        If the request failed, then there will <b>always</b> be another field called "error" containing the, well, error.<br>
+    
+        <h2>GET /api/list_currencies</h2>
+        This is the simplest endpoint.<br>
+        It takes in no input values, and an array of currency containing objects representing the currency.<br>
+        The index of each object is the currency ID.<br>
+        The object contains the name and symbol of the currency.<br><br>
+        Example request:<br> <code>GET /api/list_currencies</code><br><br>
+        Example response: <br><code>{"success":true,"currencies":[{"name":"Micronational Currency Standard","symbol":"μ"},{"name":"Pur","symbol":"Ᵽ"},{"name":"Spilling","symbol":"Ł"}]}</code>
+    
+        <h2>GET /api/account/balance</h2>
+        This endpoint returns the balance of a user.<br>
+        It takes in 2 inputs (currency and user) and returns the balance of the user's account.<br>
+        This endpoint does not require verification, both inputs are integers.<br><br>
+        Example request:<br> <code>GET /api/account/balance<br><br>{"currency": 0, "user": 93857123951231276539}</code><br><br>
+        Example response: <br> <code>{"success":true, "balance":69}</code>
+
+        <h2>GET /api/account/transaction</h2>
+        This endpoint returns information about a transaction.<br>
+        It takes in 1 input (id) and returns an object representing the requested transaction</br>
+        The "id" input represents the transaction ID, and is an integer.<br><br>
+        Example request:<br> <code> GET /api/account/transaction<br><br>{"id":6}</code><br><br>
+        Example response: <br> <code>{"success":true,"transaction":{"id":5,"currency":0,"sender":679628927831900161,"receiver":548811963577401365,"amount":10.0}}</code>
+        
+        <h2>GET /api/account/history/count</h2>
+        This endpoint returns the amount of transactions a user has made within a certain currency.<br>
+        It takes in 2 inputs (currency and user) and returns an integer representing how many transaction this user has made withihn the currency.<br>
+        Both inputs are integers.<br>
+        Example request: <br> <code> GET /api/account/history/count<br><br>{"currency": 0, "user": 93857123951231276539}</code><br><br>
+        Example response: <br> <code> {"success": true, "count": 30}</code>
+
+        <h2>GET /api/account/history/page</h2>
+        This endpoint returns an array of transaction that the user has previously made.<br>
+        It takes in 4 inputs (currency, user, start and end) and returns the array containing the transaction objects.<br>
+        Start and end are optional and are used to obtain a subset of transactions.<br>
+        All inputs are integers<br>
+        The objects returned are identical to the object returned with <code>GET /api/account/transaction</code>.<br>
+        Example request: <br><code>GET /api/account/history/page<br><br>{"currency": 0, "user": 548811963577401365}</code><br>
+        Example response: <br><code>{"success":true,"history":[{"id":1,"sender":0,"receiver":548811963577401365,"amount":5000.0},{"id":2,"sender":548811963577401365,"receiver":679628927831900161,"amount":10.0},...]}'</code>
+
+        <h2>POST /api/account/transaction</h2>
+        This endpoint allows you to make a transaction.<br>
+        It takes in 3 inputs (currency, receiver and amount) and returns nothing.
+        Currency represents the currency you want to make the transaction in, receiver represents the receiver's ID and amount represents how much you wish to send.<br>
+        Currency and receiver are integers, while amount is a float.<br>
+        <b>This endpoint requires authentication!</b><br>
+        Example request: <br><code>POST /api/account/transaction<br><br>{"currency": 0, "user": 93857123951231276539, "amount": 69.0}</code><br>
+        Example response: <br><code>{"success": true}</code>
+
+        <h2>GET /api/exchange/rates</h2>
+        This endpoint returns exchange rates of two currencies.<br>
+        It takes in 2 inputs(currency1 and currency2) and returns one object called "rates" containing two integers (buy and sell rates).<br>
+        The buy rate is the rate basically means how much of currency2 is worth 1 unit of currency1 (eg. 1 MCS = ? Lunarian Spilling).<br>
+        The sell rate is the opposite (? MCS = 1 Lunarian Spilling).<br>
+        Example request: <br><code>GET /api/exchange/rates<br><br>{"currency1": 0, "currency2": 1}</code><br>
+        Example response: <br><code>{"success": true, "rates": {"buy": 5, "sell": 0.20}}</code>
+
+        <h2>POST /api/exchange/exchange</h2>
+        This endpoint is used to exchange one currency for another.<br>
+        It takes in three inputs (currency1, currency2 and amount) and returns nothing.<br>
+        Currency1 anc currency2 are integers while amount is a float.<br>
+        The amount represents how much of currency1 you want to exchange.<br>
+        <b>This endpoint requires authentication!</b><br>
+        Example request: <br><code>POST /api/exchange/exchange<br><br>{"currency1": 0, "currency2": 1, "amount": 25.0}</code><br>
+        Example response: <br><code>{"success": true}</code>
+    </body>
+</html>

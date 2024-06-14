@@ -13,7 +13,6 @@ class Currency:
 		self.standard = id == 0
 		self.name = raw["name"]
 		self.symbol = raw["symbol"]
-		self.managers = raw["managers"]
 		self.db = db
 
 	def getBalance(self, userid):

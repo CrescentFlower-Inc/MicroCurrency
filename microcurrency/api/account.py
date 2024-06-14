@@ -87,7 +87,7 @@ async def transaction_get(request: Request):
 		if not status:
 			return {"success": False, "error": "Transaction not found!"}
 
-		return {"success": True, "transaction": {
+		return {"success": True, "transaction": { # amazing code
 			"id": transaction.id,
 			"currency": transaction.currency,
 			"sender": transaction.sender,
