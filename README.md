@@ -29,16 +29,8 @@ Then also rename `config.json.example` back to `config.json` and configure your 
 To run the bot, you just need to run `poetry run bot`.
 
 If you would like to create money for a currency, use `poetry run create_money`.
-
-## Alternatively
-You can build and run the dockerfile.
-
-Please note that you will probably need to add a line yourself such as ```dockerfile
-EXPOSE 8000
-```
-To expose a port for the API (and future website).
-This isn't really recommended though because I have not much experience with docker and may have created a bad docker file.
-
+If you would like to view all transactions, use `poetry run get_transactions`.
+Please view the `pyproject.toml` file to see any other undocumented dev scripts.
 
 # Would you like to contribute?
 
