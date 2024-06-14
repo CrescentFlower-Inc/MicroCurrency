@@ -19,9 +19,9 @@ To install this bot you need:
 
 Once you have installed those things, run the following commands:
 ```bash
-git clone https://github.com/CrescentFlower-Inc/MicroCurrency/
-cd MicroCurrency
-poetry install
+git clone https://github.com/CrescentFlower-Inc/MicroCurrency/ # This downloads the bot code
+cd MicroCurrency # This lets you enter the directory
+poetry install # This installs all the required dependencies
 ```
 Then also rename `config.json.example` back to `config.json` and configure your bot!
 
