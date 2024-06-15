@@ -23,5 +23,6 @@
 		"port": 8000,
 		"reload": false
 	},
+	"webroot": "http://yourwebsitehere",
 	"token": ""
 }

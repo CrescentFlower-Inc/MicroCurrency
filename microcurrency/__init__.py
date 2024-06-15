@@ -44,12 +44,20 @@ async def on_ready():
 
 	print("Ready!")
 
-@bot.tree.command(name="help",description="List of all commands available on the bot.")
-async def help(interaction: discord.Interaction):
+# @bot.tree.command(name="help",description="List of all commands available on the bot.")
+# async def help(interaction: discord.Interaction):
+# 	embed=discord.Embed(title="MicroCurrency [In-Development]", description="An economy bot that allows currency trades and exchanges within micronations.", color=0x6699ff)
+# 	embed.add_field(name="/test", value="A testing command for debugging bot.")
+# 	embed.add_field(name="/embtest", value="A command for testing embeds.")
+# 	embed.add_field(name="/rules", value="Read the bot rules.")
+# 	embed.set_footer(text="dev-b14 • Made by Magest1ckkz")
+# 	await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="about", description="Explains what the bot is about")
+async def about(interaction: discord.Interaction):
 	embed=discord.Embed(title="MicroCurrency [In-Development]", description="An economy bot that allows currency trades and exchanges within micronations.", color=0x6699ff)
-	embed.add_field(name="/test", value="A testing command for debugging bot.")
-	embed.add_field(name="/embtest", value="A command for testing embeds.")
-	embed.add_field(name="/rules", value="Read the bot rules.")
+	embed.add_field(name="Unfinished", value="This command is unfinished :P.")
+	if config["api"]["enabled"]: embed.add_field(name="Link to API docs", value=f"[Click here to go to the API documentation]({config['webroot']}/docs.html)")
 	embed.set_footer(text="dev-b14 • Made by Magest1ckkz")
 	await interaction.response.send_message(embed=embed)
 
