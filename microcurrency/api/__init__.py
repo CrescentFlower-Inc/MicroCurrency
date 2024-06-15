@@ -29,5 +29,5 @@ async def list():
 
 
 app.mount("/api/exchange", exchangeApp)
-app.mount("/api/account", accountAp)
+app.mount("/api/account", accountApp)
 app.mount("/", StaticFiles(directory=str(STATIC)))
