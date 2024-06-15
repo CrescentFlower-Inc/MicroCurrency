@@ -14,7 +14,7 @@ CONFIG = PATH / "config.json"
 with open(str(CONFIG)) as f:
 	config = json.loads(f.read())
 
-PACKAGES = ["account", "exchange", "apic"]
+PACKAGES = ["account", "exchange", "apic", "manager"]
 
 # Main code
 

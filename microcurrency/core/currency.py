@@ -13,6 +13,7 @@ class Currency:
 		self.standard = id == 0
 		self.name = raw["name"]
 		self.symbol = raw["symbol"]
+		self.role = raw["managing_role"]
 		self.db = db
 
 	def getBalance(self, userid):
@@ -22,7 +23,7 @@ class Currency:
 		status, rawt = self.db.getTransactionById(tid)
 		if not status: return False, "Transaction doesn't exist"
 
-		return True, Transaction(rawt[0], self, rawt[2], rawt[3], rat[4])
+		return True, Transaction(rawt[0], self, rawt[2], rawt[3], rawt[4])
 
 	def getTransactions(self):
 		return self.db.getTransactions(self.id)

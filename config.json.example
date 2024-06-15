@@ -2,15 +2,18 @@
 	"currencies": [
 		{
 			"name": "Micronational Currency Standard",
-			"symbol": "μ",
+			"symbol": "μ",,
+			"managing_role": 1202348639406530621
 		},
 		{
 			"name": "Pur",
 			"symbol": "Ᵽ",
+			"managing_role": 0
 		},
 		{
 			"name": "Spilling",
 			"symbol": "Ł",
+			"managing_role": 0
 		}
 	],
     "dev_server": {
