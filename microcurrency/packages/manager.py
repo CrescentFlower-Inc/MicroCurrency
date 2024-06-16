@@ -1,6 +1,7 @@
 # API Control
 from microcurrency.core.db import Database
 from microcurrency.core.currency import Currency
+from microcurrency.packages.account import TransactionHistoryPager
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
@@ -34,7 +35,7 @@ class Manager(commands.Cog):
 		@app_commands.guilds(discord.Object(config["dev_server"]["server"]))
 		@app_commands.choices(currency = curchoices)
 		@app_commands.describe(currency = "In what currency?", amount="How much do you wish to create?", receiver="To whom would you like to gift this new money?")
-		@bot.tree.command(name="create_money", description="Adds more money in circulation. WARNING: THIS CAN MESS UP YOUR ECONOMY IF ABUSED.")
+		@bot.tree.command(name="create_money", description="(Manager only) Adds more money in circulation. WARNING: THIS CAN MESS UP YOUR ECONOMY IF ABUSED.")
 		async def create_money(interaction: discord.Interaction, currency: app_commands.Choice[int], amount: float, receiver: discord.Member):
 			currency = currencies[currency.value]
 			role = discord.utils.find(lambda r: r.id == currency.role, interaction.guild.roles)
@@ -61,7 +62,23 @@ class Manager(commands.Cog):
 			embed = discord.Embed(title=title, color=color, description=responses[code])
 			await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
+		@app_commands.guilds(discord.Object(config["dev_server"]["server"]))
+		@app_commands.choices(currency = curchoices)
+		@app_commands.describe(currency = "Of what currency?")
+		@bot.tree.command(name="list_transactions", description="(Manager only) Lists all transactions of a currency")
+		async def list_transactions(interaction: discord.Interaction, currency: app_commands.Choice[int]):
+			currency = currencies[currency.value]
+			role = discord.utils.find(lambda r: r.id == currency.role, interaction.guild.roles)
+			if not role in interaction.user.roles:
+				print(f"Unauthorized attempt at using /list_transactions by {interaction.user.display_name} ({interaction.user.id})!")
+				embed = discord.Embed(title="Access denied", description="You are not authorized to use this command!", color=0xff0000)
+				await interaction.response.send_message(embeds=[embed], ephemeral=True)
+				return
 
+			transaction_len, transactions = currency.getTransactions()
+			pager = TransactionHistoryPager(transaction_len, transactions, currency.symbol, interaction.user.id)
+			await interaction.response.send_message(embeds=[pager.getEmbed()], view=pager, ephemeral=True)
+			
 
         # @reload_command.error
         # async def reload_command_error(interaction: discord.Interaction, error):

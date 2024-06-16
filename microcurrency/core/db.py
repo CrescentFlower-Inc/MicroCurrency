@@ -45,7 +45,8 @@ class Database:
 		if currency == None:
 			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions").fetchall())
 		else:
-			return (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in self.curr.execute("SELECT * FROM transactions WHERE cid=?", (currency)).fetchall())
+			rawhist = self.curr.execute("SELECT * FROM transactions WHERE cid=?", (int(currency),)).fetchall() # probably shuold also do this for the upper one, however that may break shit
+			return len(rawhist), (Transaction(t[0], t[1], t[2], t[3], t[4]) for t in rawhist)
 
 	def getTransactionsOfUser(self, user, currency=None):
 		# # rawhist = self.curr.execute("SELECT * FROM ")

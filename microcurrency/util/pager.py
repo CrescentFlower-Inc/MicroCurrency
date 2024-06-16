@@ -11,6 +11,7 @@ class GeneralPager(discord.ui.View):
         self.description = "More information"
         self.pages = 0 # This should be set by an inheriting class!
         self.page = 0
+        # self.ephemeral = ephemeral
 
     ##################################################
     async def move_page(self, interaction, number):
