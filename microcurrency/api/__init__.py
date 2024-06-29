@@ -4,6 +4,7 @@ from microcurrency.core.currency import Currency
 from microcurrency.core.db import Database
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 from pathlib import Path
 import json
 
@@ -26,6 +27,10 @@ app = FastAPI()
 @app.get("/api/list_currencies")
 async def list():
 	return {"success": True, "currencies": config["currencies"]}
+
+@app.get("/")
+async def read_index():
+    return FileResponse(str(STATIC / "index.html"))
 
 
 app.mount("/api/exchange", exchangeApp)
