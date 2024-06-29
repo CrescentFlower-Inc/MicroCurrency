@@ -1,4 +1,4 @@
-from microcurrency.db import Database
+from microcurrency.core.db import Database
 from pathlib import Path
 import json
 
@@ -22,10 +22,16 @@ def print_currencies():
 
 def create_money():
 	print_currencies()
-	currency_id = int(input("Enter currnecy ID: "))
+	currency_id = int(input("Enter currency ID: "))
 	receiver_id = input("Enter user ID of receiver: ")
 	amount = float(input("Enter amount you want to create: "))
 
 	code = db.createTransaction(currency_id, 0, receiver_id, amount)
 
 	print(f"Exiting with code {code}")
+
+def get_transactions():
+	print("Transaction printer 3000")
+	print("tid		cid		sid		rid		amt	")
+	for transaction in db.getTransactions():
+		print(f"{transaction[0]} {transaction[1]} {transaction[2]} {transaction[3]} {transaction[4]}")
