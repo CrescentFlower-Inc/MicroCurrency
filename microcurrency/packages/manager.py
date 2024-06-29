@@ -2,10 +2,34 @@
 from microcurrency.core.db import Database
 from microcurrency.core.currency import Currency
 from microcurrency.packages.account import TransactionHistoryPager
+from microcurrency.util.mround import mround
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
 import discord, json
+
+class Confirmation(discord.ui.View):
+	def __init__(self, callback, args=(), timeout=180):
+		super().__init__(timeout=timeout)
+
+		self.callback = callback
+		self.args = args
+
+	def getEmbed(self):
+		embed = discord.Embed(title="Are you sure?", description="The following action may have unforseen consequences, are you sure you want to proceed?", color=0xff0000)
+		return embed
+	
+	@discord.ui.button(label="Abort", style=discord.ButtonStyle.gray)
+	async def abort(self, interaction: discord.Interaction, button: discord.ui.Button):
+		await interaction.response.edit_message(content="The action has been aborted", embeds=[], view=None)
+
+
+	@discord.ui.button(label="Continue", style=discord.ButtonStyle.red)
+	async def _continue(self, interaction: discord.Interaction, button: discord.ui.Button):
+		args = (interaction,) + self.args
+		await self.callback(*args)
+
+
 class Manager(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -79,6 +103,37 @@ class Manager(commands.Cog):
 			pager = TransactionHistoryPager(transaction_len, transactions, currency.symbol, interaction.user.id)
 			await interaction.response.send_message(embeds=[pager.getEmbed()], view=pager, ephemeral=True)
 			
+		@app_commands.guilds(discord.Object(config["dev_server"]["server"]))
+		@app_commands.choices(currency=curchoices)
+		@app_commands.describe(currency="The currency of the transaction", sender="Who you want to make the transaction as", receiver="Who you would like to send money towards", amount="How much")
+		@bot.tree.command(name="create_transaction", description="(Manager only) creates a transaction on the behalf of a user")
+		async def remove_transaction(interaction: discord.Interaction, currency: app_commands.Choice[int], sender: discord.Member, receiver: discord.Member, amount: float):
+			async def callback(interaction: discord.Interaction, currency, sender, receiver, amount):
+				status = currency.createTransaction(sender.id, receiver.id, amount)
+				responses = [
+					f"Succesfully transfered {mround(amount)} {currency.symbol} from {sender.display_name} to {receiver.display_name}",
+					f"{sender.display_name} cannot send no or negative money!",
+					f"{sender.display_name} cannot send money to themself!",
+					f"{sender.display_name} has insufficient funds!"
+				]
+
+				color = [0x00ff00, 0xff0000][status>0] # if status>0 is true, index "1" gets set into color (aka the red hex code), if it's false then index "0" gets set into color (aka green hex code)
+				title = [":white_check_mark: Transaction completed", ":x: Transaction failed"][status>0] # same thing with color
+
+				embed = discord.Embed(title=title, color=color, description=responses[status])
+				await interaction.response.send_message(embeds=[embed], ephemeral=True)
+				# await interaction.response.send_message(content="lol", ephemeral=True)
+
+			currency = currencies[currency.value]
+			role = discord.utils.find(lambda r: r.id == currency.role, interaction.guild.roles)
+			if not role in interaction.user.roles:
+				print(f"Unauthorized attempt at using /create_transaction by {interaction.user.display_name} ({interaction.user.id})!")
+				embed = discord.Embed(title="Access denied", description="You are not authorized to use this command!", color=0xff0000)
+				await interaction.response.send_message(embeds=[embed], ephemeral=True)
+				return
+
+			confirmation = Confirmation(callback, (currency,sender,receiver,amount,))
+			await interaction.response.send_message(embeds=[confirmation.getEmbed()], view=confirmation, ephemeral=True)
 
         # @reload_command.error
         # async def reload_command_error(interaction: discord.Interaction, error):
