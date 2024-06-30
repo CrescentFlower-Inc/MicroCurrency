@@ -55,17 +55,19 @@ async def on_ready():
 
 @bot.tree.command(name="about", description="Explains what the bot is about")
 async def about(interaction: discord.Interaction):
-	embed=discord.Embed(title="MicroCurrency [In-Development]", description="An economy bot that allows currency trades and exchanges within micronations.", color=0x6699ff)
-	embed.add_field(name="Unfinished", value="This command is unfinished :P.")
-	if config["api"]["enabled"]: embed.add_field(name="Link to API docs", value=f"[Click here to go to the API documentation]({config['webroot']}/docs.html)")
+	description = "MicroCurrency is an economy bot specifically designed for micronations or other organizations that want a functioning digital economy\nIt has support for decimal values, exchanges and also has an API.\nThis bot has been developed by the CrescentFlower Inc., which is affiliated with the Lunarian Federation.\nIf you havea suggestion, found a bug, need support or want more information, check out the links below."
+
+	embed=discord.Embed(title="MicroCurrency", description=description, color=0x6699ff)
+	# embed.add_field(name="Unfinished", value="This command is unfinished :P.")
+	if config["api"]["enabled"]: embed.add_field(name="Links", value=f"[Click here to go to the API documentation]({config['webroot']}/docs.html)\n[Click here to go to the official website]({config['webroot']})\n[Click here to go to the github repository](https://github.com/CrescentFlower-Inc/MicroCurrency)")
 	embed.set_footer(text="dev-b14 • Made by Magest1ckkz")
 	await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="rules",description="Read the rules before doing anything in the bot.")
-async def embtest(interaction: discord.Interaction):
-	embed=discord.Embed(title="MicroCurrency Rules", description="You must agree with the rules to use this bot. By using this bot, you agree with the rules.\n\n:one: • Do not use macros, other bots, or anything else for farming.\n:two: • No scamming\n:three: • No hacking", color=0x6699ff)
-	embed.set_footer(text="Violating any of the rules might result to your bank account reset or terminated.")
-	await interaction.response.send_message(embed=embed)
+# @bot.tree.command(name="rules",description="Read the rules before doing anything in the bot.")
+# async def embtest(interaction: discord.Interaction):
+# 	embed=discord.Embed(title="MicroCurrency Rules", description="You must agree with the rules to use this bot. By using this bot, you agree with the rules.\n\n:one: • Do not use macros, other bots, or anything else for farming.\n:two: • No scamming\n:three: • No hacking", color=0x6699ff)
+# 	embed.set_footer(text="Violating any of the rules might result to your bank account reset or terminated.")
+# 	await interaction.response.send_message(embed=embed)
 
 @app_commands.checks.has_any_role(config["dev_server"]["role"])
 @app_commands.guilds(discord.Object(config["dev_server"]["server"]))
