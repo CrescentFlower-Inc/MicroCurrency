@@ -36,7 +36,7 @@ async def reload_packages():
 
 @bot.event
 async def on_ready():
-	print("MicroCurrency [In-Development], version dev-b14")
+	print("MicroCurrency, version 1.0")
 
 	await load_packages()
 	await bot.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='the market | /help'))
@@ -60,7 +60,7 @@ async def about(interaction: discord.Interaction):
 	embed=discord.Embed(title="MicroCurrency", description=description, color=0x6699ff)
 	# embed.add_field(name="Unfinished", value="This command is unfinished :P.")
 	if config["api"]["enabled"]: embed.add_field(name="Links", value=f"[Click here to go to the API documentation]({config['webroot']}/docs.html)\n[Click here to go to the official website]({config['webroot']})\n[Click here to go to the github repository](https://github.com/CrescentFlower-Inc/MicroCurrency)")
-	embed.set_footer(text="dev-b14 • Made by Magest1ckkz")
+	embed.set_footer(text="v1.0 • Made by Magest1ckkz")
 	await interaction.response.send_message(embed=embed)
 
 # @bot.tree.command(name="rules",description="Read the rules before doing anything in the bot.")
