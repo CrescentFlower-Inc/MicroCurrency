@@ -2,7 +2,7 @@ body{
     background: linear-gradient(135deg, #999, #09a);
     background-repeat: no-repeat;
     background-attachment: fixed;
-    font-family: "PT Sans", Calibri, Tahoma, sans-serif;
+    font-family: "PT Root UI", Arial, Helvetica, sans-serif;
 }
 
 .navbar {
@@ -21,29 +21,35 @@ body{
 }
 
 .navbar a:hover {
-    background-color: #ddd;
+    background-image: linear-gradient(#f167fd, #0054b3);
+    transition: 0.5s;
     color: black;
 }
 
 #add_bot {
+    background-image: linear-gradient(to right, #3cccc5 0%, #bf54e9  51%, #2400c7  100%);
+    margin: 25px;
+    padding: 15px 45px;
+    width: 100px;
+    height: 20px;
     text-align: center;
-    width: 200px;
-    height: 50px;
-    background: linear-gradient(135deg, #733, #d00);
-    /* background-repeat: no-repeat;
-    background-attachment: fixed; */
-    border: solid black 2px;
-    border-radius: 25px;
-}
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;            
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+  }
 
 #add_bot a {
     position: relative;
-    top: 25%;
     text-decoration: none;
     text-align: center;
     color: white;
 }
 
 #add_bot:hover {
-    background: linear-gradient(135deg, #511, #b00);
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
 }
