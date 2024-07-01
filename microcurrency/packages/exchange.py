@@ -89,7 +89,7 @@ class Exchange(commands.Cog):
 		@app_commands.describe(currency1 = "The currency you want to exchange", currency2 = "The currency that you want to receive", amount = "The amount of currency1 you want to exchange")
 		@app_commands.choices(currency1 = curchoices, currency2 = curchoices)
 		@bot.tree.command(name="exchange", description="Exchange two currencies")
-		async def exchange(interaction: discord.Interaction, currency1: app_commands.Choice[int], currency2: app_commands.Choice[int], amount: int):
+		async def exchange(interaction: discord.Interaction, currency1: app_commands.Choice[int], currency2: app_commands.Choice[int], amount: float):
 			currencyA = currencies[currency1.value]
 			currencyB = currencies[currency2.value]
 
