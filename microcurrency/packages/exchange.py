@@ -97,7 +97,7 @@ class Exchange(commands.Cog):
 			status, exchangedamt = createExchangeTransaction(interaction.user.id, rate_BA, amount, currencyB, currencyA)
 
 			responses = [
-				f"Succesfully exchanged `{mround(amount)} {currencyA.symbol} for `{mround(exchangedamt)} {currencyB.symbol}``",
+				f"Succesfully exchanged `{mround(amount)} {currencyA.symbol}` for `{mround(exchangedamt)} {currencyB.symbol}`",
 				f"You cannot exchange `{currencyB.name}` for `{currencyA.name}`!",
 				f"The bot has insufficient funds, contact an administrator immediatley!",
 				f"The amount you are trying to exchange is negative or zero!",
