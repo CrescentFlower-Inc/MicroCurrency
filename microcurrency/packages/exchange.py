@@ -80,11 +80,10 @@ class Exchange(commands.Cog):
 			currencyB = currencies[currency2.value]
 
 			rate_AB, rate_BA = getExchangeRates(currencyA, currencyB)
-			toolow = lambda rate: ["","<"][rate<0.01]
 
 			embed = discord.Embed(title="Exchange Rates", description=f"Here are the buy and sell rates of `{currencyA.name}` and `{currencyB.name}`", color=0x00ff00)
-			embed.add_field(name="Buy rate", value=f"1.00 {currencyA.symbol} = {toolow(rate_BA)}{mround(rate_BA)} {currencyB.symbol}", inline=True)
-			embed.add_field(name="Sell rate", value=f"{toolow(rate_AB)}{mround(rate_AB)} {currencyA.symbol} = 1.00 {currencyB.symbol}", inline=True)
+			embed.add_field(name="Buy rate", value=f"1.00 {currencyA.symbol} = {mround(rate_BA)} {currencyB.symbol}", inline=True)
+			embed.add_field(name="Sell rate", value=f"{mround(rate_AB)} {currencyA.symbol} = 1.00 {currencyB.symbol}", inline=True)
 
 			await interaction.response.send_message(embeds=[embed])
 
