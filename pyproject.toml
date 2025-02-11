@@ -16,8 +16,8 @@ sqlmodel = "^0.0.22"
 
 [tool.poetry.scripts]
 bot = "microcurrency.__init__:start"
-create_money = "microcurrency.scripts:create_money"
-get_transactions = "microcurrency.scripts:get_transactions"
+create_currency = "microcurrency.scripts:create_curr"
+create_transaction = "microcurrency.scripts:create_transaction"
 
 [build-system]
 requires = ["poetry-core"]
