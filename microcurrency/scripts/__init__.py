@@ -1,6 +1,6 @@
 from sqlmodel import select
-from microcurrency.core.models import Currency
 from microcurrency.core.db import create_db_and_tables, get_session
+from microcurrency.core.models import Currency
 
 create_db_and_tables()
 session = get_session()
