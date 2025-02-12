@@ -3,6 +3,7 @@ from microcurrency.core.db import create_db_and_tables, get_session
 from microcurrency.core.config import get_config
 from microcurrency.core.models import * # cluttering but who cares
 from microcurrency.core.Account import Account
+from sqlmodel import select
 from discord import app_commands
 from discord.ext import commands
 import discord
@@ -14,10 +15,16 @@ bot = commands.Bot(command_prefix="cur!", intents=discord.Intents.default())
 async def on_ready():
 	print("MicroCurrency, version 2.0")
 
-	# sneak in our own data
+	# get currencies and stuf
 	session = get_session()
+	statement = select(Currency)
+	# currencies = session.exec(statement).fetchall()
+	curchoices = [app_commands.Choice(name=currency.fullname, value=currency.id) for currency in session.exec(statement).fetchall()]
+
+	# sneak in our own data
 	bot.___CONFIG = config
 	bot.___SESSION = session
+	bot.___CURCHOICES = curchoices
 
 	await bot.load_extension("microcurrency.core.Account")
 
